@@ -212,9 +212,6 @@ public class Partita {
                 }
                 return false;
             case RE:
-                if(arrocco(p, posizioneFin)){
-                    return true;
-                }
                 if (Math.abs(posizioneFin.getColonna().ordinal() - p.getPosizione().getColonna().ordinal()) + Math.abs(posizioneFin.getRiga().ordinal() - p.getPosizione().getRiga().ordinal()) == 1 || (Math.abs(posizioneFin.getColonna().ordinal() - p.getPosizione().getColonna().ordinal()) + Math.abs(posizioneFin.getRiga().ordinal() - p.getPosizione().getRiga().ordinal()) == 2 && !(posizioneFin.getColonna().ordinal() == p.getPosizione().getColonna().ordinal() || posizioneFin.getRiga().ordinal() == p.getPosizione().getRiga().ordinal()))) {
                     if (isOccupato(posizioneFin)) {
                         return isOccupato(posizioneFin, p.getColore());
@@ -243,7 +240,16 @@ public class Partita {
     }
 
     public boolean arrocco(Pezzo p, Posizione posizioneFin) {
-        if ((posizioneFin.getColonna().ordinal() == p.getPosizione().getColonna().ordinal() + 2 && posizioneFin.getRiga() == p.getPosizione().getRiga()) && !isOccupato(new Posizione(posizioneFin.getRiga(), F)) && p.getMosse().isEmpty() && trovaPezzo(new Posizione(posizioneFin.getRiga(), H)).getMosse().isEmpty()) {
+        Partita partita = new Partita(pezziBianchi, pezziNeri, ultimaMossa);
+        if (trovaPezzo(new Posizione(posizioneFin.getRiga(), H)).getMosse().isEmpty() && p.getMosse().isEmpty() && (posizioneFin.getColonna().ordinal() == p.getPosizione().getColonna().ordinal() + 2 && posizioneFin.getRiga() == p.getPosizione().getRiga()) && p.getSimbolo() == RE && !isScacco(partita, p.getColore(), new Posizione(posizioneFin.getRiga(), F)) && !isOccupato(new Posizione(posizioneFin.getRiga(), F)) && !isScacco(partita, p.getColore(), new Posizione(posizioneFin.getRiga(), E)) && !isOccupato(posizioneFin)) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean arroccoLungo(Pezzo p, Posizione posizioneFin) {
+        Partita partita = new Partita(pezziBianchi, pezziNeri, ultimaMossa);
+        if (trovaPezzo(new Posizione(posizioneFin.getRiga(), H)).getMosse().isEmpty() && p.getMosse().isEmpty() && (posizioneFin.getColonna().ordinal() == p.getPosizione().getColonna().ordinal() - 2 && posizioneFin.getRiga() == p.getPosizione().getRiga()) && p.getSimbolo() == RE && !isScacco(partita, p.getColore(), new Posizione(posizioneFin.getRiga(), D)) && !isOccupato(new Posizione(posizioneFin.getRiga(), D)) && !isScacco(partita, p.getColore(), new Posizione(posizioneFin.getRiga(), E)) && !isOccupato(new Posizione(posizioneFin.getRiga(), B)) && !isOccupato(posizioneFin) && !isScacco(partita, p.getColore(), new Posizione(posizioneFin.getRiga(), C))) {
             return true;
         }
         return false;
@@ -301,8 +307,8 @@ public class Partita {
         }
         for (Posizione p : mossePossibiliConSacco(pez)) {
             if (p.equals(pos2)) {
-                trovaPezzo(pos1).getMosse().add(new Mossa(pos1, pos2));
                 sposta(pez, pos2);
+                trovaPezzo(pos2).getMosse().add(new Mossa(pos1, pos2));
                 ultimaMossa = new Mossa(pos1, pos2);
                 mossePartita.add(new Mossa(pos1, pos2));
                 if (turnoCorrente == BIANCO) {
@@ -432,6 +438,10 @@ public class Partita {
                 pos = new Posizione(Riga.values()[i], Colonna.values()[j]);
                 if (controlloPosizione(p, pos)) {
                     a.add(pos);
+                } else if (arrocco(p, pos)) {
+                    a.add(pos);
+                } else if (arroccoLungo(p, pos)) {
+                    a.add(pos);
                 }
             }
         }
@@ -514,11 +524,13 @@ public class Partita {
                 }
             }
         }
-        //TODO sposta torre in arrocco
-//        if(arrocco(p, pos)){
-//            sposta(trovaPezzo(new Posizione(pos.getRiga(), H)), new Posizione(pos.getRiga(), F));
-//        }
-        if (turnoCorrente == BIANCO) {
+        if (arrocco(p, pos)) {
+            trovaPezzo(new Posizione(pos.getRiga(), H)).setPosizione(new Posizione(pos.getRiga(), F));
+        }
+        if (arroccoLungo(p, pos)) {
+            trovaPezzo(new Posizione(pos.getRiga(), A)).setPosizione(new Posizione(pos.getRiga(), D));
+        }
+        if (p.getColore() == BIANCO) {
             for (Pezzo pezzo : pezziNeri) {
                 if (pezzo.getPosizione().equals(pos)) {
                     pezziNeri.remove(pezzo);
@@ -637,5 +649,20 @@ public class Partita {
             }
             return false;
         }
+    }
+
+    public boolean isScacco(Partita p, Colore c, Posizione pos) {
+        if (c == BIANCO) {
+            p.sposta(p.trovaPezzo(p.trovaRe(p.getPezziBianchi())), pos);
+            if (!p.pedineScacco(p, c).isEmpty()) {
+                return true;
+            }
+        } else {
+            p.sposta(p.trovaPezzo(p.trovaRe(p.getPezziBianchi())), pos);
+            if (!p.pedineScacco(p, c).isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
