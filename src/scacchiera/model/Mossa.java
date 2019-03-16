@@ -31,4 +31,8 @@ public class Mossa {
     public Posizione getPosFin() {
         return posFin;
     }
+    
+    public boolean equals(Mossa m){
+        return posIni.equals(m.posIni) && posFin.equals(m.posFin);
+    }
 }
