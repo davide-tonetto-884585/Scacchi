@@ -84,7 +84,7 @@ public class Coding {
      * @return
      */
     public static String ambiguo(Partita partita, Mossa mossa) {
-        ArrayList<Pezzo> sameSimbolo = sameSimbolo(partita.trovaPezzo(mossa.getPosFin()), partita, mossa.getPosFin());
+        ArrayList<Pezzo> sameSimbolo = sameSimbolo(partita.trovaPezzo(mossa.getPosIni()), partita, mossa.getPosFin());
         Pezzo p = partita.trovaPezzo(mossa.getPosIni());
         boolean riga = false, colonna = false;
         for (Pezzo pezzo : sameSimbolo) {
@@ -98,7 +98,7 @@ public class Coding {
                 colonna = true;
             }
         }
-        return (colonna ? p.getPosizione().getColonna().toString() + (riga ? p.getPosizione().getRiga().toString() : "") : (riga ? p.getPosizione().getRiga().toString() : ""));
+        return (colonna ? p.getPosizione().getRiga().toString() + (riga ? p.getPosizione().getColonna().toString() : "") : (riga ? p.getPosizione().getColonna().toString() : ""));
     }
 
     /**
