@@ -149,12 +149,12 @@ public class FXMLDocumentController implements Initializable {
                         pos2 = null;
 //                        System.out.println("Scacco bianchi " + p.isScacco(Colore.BIANCO));
 //                        System.out.println("Scacco neri " + p.isScacco(Colore.NERO));
-                        if (p.isScacco(Colore.BIANCO)) {
+                        if (p.isScaccoMatto(Colore.BIANCO)) {
                             Alert alert = new Alert(Alert.AlertType.INFORMATION);
                             alert.setTitle("Scacco Matto!");
                             alert.setContentText("il nero ha vinto!");
                             alert.showAndWait();
-                        } else if (p.isScacco(Colore.NERO)) {
+                        } else if (p.isScaccoMatto(Colore.NERO)) {
                             Alert alert = new Alert(Alert.AlertType.INFORMATION);
                             alert.setTitle("Scacco Matto!");
                             alert.setContentText("il bianco ha vinto!");

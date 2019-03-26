@@ -7,10 +7,12 @@ package scacchiera.model.salvataggio;
 
 import java.util.ArrayList;
 import scacchiera.model.Colore;
+import static scacchiera.model.Colore.*;
 import scacchiera.model.Mossa;
 import scacchiera.model.Partita;
 import scacchiera.model.Pezzo;
 import scacchiera.model.Posizione;
+import scacchiera.model.Posizione.*;
 import static scacchiera.model.Simbolo.*;
 
 /**
@@ -28,50 +30,93 @@ public class Coding {
             Mossa mossa = mosse.get(i * 2);
             Pezzo p = partita.trovaPezzo(mossa.getPosIni());
             if (p.getSimbolo() == RE && (mossa.getPosIni().getColonna().ordinal() == mossa.getPosFin().getColonna().ordinal() + 2 || mossa.getPosIni().getColonna().ordinal() == mossa.getPosFin().getColonna().ordinal() - 2)) {
-                sb.append("O-O");
+                sb.append("0-0");
                 if (mossa.getPosIni().getColonna().ordinal() == mossa.getPosFin().getColonna().ordinal() + 2) {
-                    sb.append("-O");
+                    sb.append("-0");
                 }
             } else {
                 if (p.getSimbolo() != PEDONE) {
                     sb.append(p.getSimbolo().getCodingSimbol());
                 }
-                if(isAmbiguo(partita, p, mossa.getPosFin())){
+                if (isAmbiguo(partita, p, mossa.getPosFin())) {
                     sb.append(ambiguo(partita, mossa));
                 }
                 if (partita.trovaPezzo(mossa.getPosFin()) != null) {
                     sb.append("x");
                 }
                 sb.append(mossa.getPosFin().toString());
+                if (mossa.getSimbolo() != null) {
+                    sb.append("=");
+                    sb.append(mossa.getSimbolo().getCodingSimbol());
+                    p.setSimbolo(mossa.getSimbolo());
+                }
+            }
+            partita.sposta(p, mossa.getPosFin());
+            if (partita.isScaccoMatto(Colore.NERO)) {
+                sb.append("#");
+            } else if (partita.isScacco(Colore.NERO)) {
+                sb.append("+");
             }
             sb.append(" ");
-            partita.sposta(p, mossa.getPosFin());
             if (mosse.size() == (i * 2) + 1) {
                 break;
             }
             mossa = mosse.get((i * 2) + 1);
             p = partita.trovaPezzo(mossa.getPosIni());
             if (p.getSimbolo() == RE && (mossa.getPosIni().getColonna().ordinal() == mossa.getPosFin().getColonna().ordinal() + 2 || mossa.getPosIni().getColonna().ordinal() == mossa.getPosFin().getColonna().ordinal() - 2)) {
-                sb.append("O-O");
+                sb.append("0-0");
                 if (mossa.getPosIni().getColonna().ordinal() == mossa.getPosFin().getColonna().ordinal() + 2) {
-                    sb.append("-O");
+                    sb.append("-0");
                 }
             } else {
                 if (p.getSimbolo() != PEDONE) {
                     sb.append(p.getSimbolo().getCodingSimbol());
                 }
-                if(isAmbiguo(partita, p, mossa.getPosFin())){
+                if (isAmbiguo(partita, p, mossa.getPosFin())) {
                     sb.append(ambiguo(partita, mossa));
                 }
                 if (partita.trovaPezzo(mossa.getPosFin()) != null) {
                     sb.append("x");
                 }
                 sb.append(mossa.getPosFin().toString());
+                if (mossa.getSimbolo() != null) {
+                    sb.append("=");
+                    sb.append(mossa.getSimbolo().getCodingSimbol());
+                    p.setSimbolo(mossa.getSimbolo());
+                }
+            }
+            partita.sposta(p, mossa.getPosFin());
+            if (partita.isScaccoMatto(Colore.BIANCO)) {
+                sb.append("#");
+            } else if (partita.isScacco(Colore.BIANCO)) {
+                sb.append("+");
             }
             sb.append(" ");
-            partita.sposta(p, mossa.getPosFin());
+        }
+        if (partita.isScaccoMatto(Colore.NERO)) {
+            sb.append("1-0");
+        } else if (partita.isScaccoMatto(Colore.BIANCO)) {
+            sb.append("0-1");
+        } else {
+            sb.append("1/2-1/2");
         }
         return sb.toString();
+    }
+
+    public ArrayList<Mossa> decoding(String code) {
+        ArrayList<Mossa> mosse = new ArrayList<>();
+        String[] array = code.split(" ");
+        int giri = 0;
+
+        for (String s : array) {
+            if (!s.contains(".")) {
+
+                //pezzo iniziale
+            }
+            giri++;
+        }
+
+        return mosse;
     }
 
     /**
@@ -129,5 +174,78 @@ public class Coding {
 
     public static boolean isAmbiguo(Partita partita, Pezzo pezzo, Posizione posF) {
         return sameSimbolo(pezzo, partita, posF).size() != 1;
+    }
+
+    public static Mossa stringToMossa(String s, int giri) {
+        Pezzo p;
+        if (giri % 3 == 1) {
+            p = new Pezzo(PEDONE, BIANCO);
+        } else {
+            p = new Pezzo(PEDONE, NERO);
+        }
+
+        switch (s.charAt(0)) {
+            case 'N':
+                p.setSimbolo(CAVALLO);
+                break;
+            case 'K':
+                p.setSimbolo(RE);
+                break;
+            case 'Q':
+                p.setSimbolo(REGINA);
+                break;
+            case 'B':
+                p.setSimbolo(ALFIERE);
+                break;
+            case 'T':
+                p.setSimbolo(TORRE);
+                break;
+        }
+
+        //controllo lettera per lettera
+        Colonna col = null;
+        Riga rig = null;
+        int stato = 0;
+        for (char c : s.toCharArray()) {
+            switch (stato) {
+                case 0:
+                    switch (c) {
+                        case 'a':
+                        case 'b':
+                        case 'c':
+                        case 'd':
+                        case 'e':
+                        case 'f':
+                        case 'g':
+                        case 'h':
+                            stato = 1;
+                            break;
+                        case '1':
+                        case '2':
+                        case '3':
+                        case '4':
+                        case '5':
+                        case '6':
+                        case '7':
+                        case '8':
+                            stato = 2;
+                    }
+                    break;
+                case 1: // gestione colonna
+                    switch(c){
+                        case 'a':
+                        case 'b':
+                        case 'c':
+                        case 'd':
+                        case 'e':
+                        case 'f':
+                        case 'g':
+                        case 'h':
+                        case 'x':
+                            
+                    }
+            }
+        }
+        return null;
     }
 }

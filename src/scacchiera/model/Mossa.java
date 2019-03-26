@@ -13,10 +13,19 @@ public class Mossa {
 
     private Posizione posIni;
     private Posizione posFin;
+    private Simbolo simbolo;
 
     public Mossa(Posizione posIni, Posizione posFin) {
         this.posIni = posIni;
         this.posFin = posFin;
+    }
+
+    public void setSimbolo(Simbolo simbolo) {
+        this.simbolo = simbolo;
+    }
+
+    public Simbolo getSimbolo() {
+        return simbolo;
     }
     
     public Mossa(Mossa m){

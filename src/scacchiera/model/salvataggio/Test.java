@@ -15,13 +15,13 @@ import scacchiera.model.Posizione;
 public class Test {
 
     public static void main(String[] args) {
-        Partita p = new Partita();
-        p.muovi(p.trovaPezzo(new Posizione(Posizione.Riga.R2, Posizione.Colonna.B)).getPosizione(), new Posizione(Posizione.Riga.R4, Posizione.Colonna.B));
-        p.muovi(p.trovaPezzo(new Posizione(Posizione.Riga.R7, Posizione.Colonna.A)).getPosizione(), new Posizione(Posizione.Riga.R5, Posizione.Colonna.A));
-        p.muovi(p.trovaPezzo(new Posizione(Posizione.Riga.R2, Posizione.Colonna.C)).getPosizione(), new Posizione(Posizione.Riga.R3, Posizione.Colonna.C));
-        p.muovi(p.trovaPezzo(new Posizione(Posizione.Riga.R7, Posizione.Colonna.C)).getPosizione(), new Posizione(Posizione.Riga.R5, Posizione.Colonna.C));
-        p.muovi(p.trovaPezzo(new Posizione(Posizione.Riga.R3, Posizione.Colonna.C)).getPosizione(), new Posizione(Posizione.Riga.R4, Posizione.Colonna.C));
-        p.muovi(p.trovaPezzo(new Posizione(Posizione.Riga.R5, Posizione.Colonna.C)).getPosizione(), new Posizione(Posizione.Riga.R4, Posizione.Colonna.B));
-        System.out.println(Coding.encoding(p.getMossePartita()));
+//        Partita p = new Partita();
+//        p.muovi(p.trovaPezzo(new Posizione(Posizione.Riga.R2, Posizione.Colonna.B)).getPosizione(), new Posizione(Posizione.Riga.R4, Posizione.Colonna.B));
+//        p.muovi(p.trovaPezzo(new Posizione(Posizione.Riga.R7, Posizione.Colonna.A)).getPosizione(), new Posizione(Posizione.Riga.R5, Posizione.Colonna.A));
+//        p.muovi(p.trovaPezzo(new Posizione(Posizione.Riga.R2, Posizione.Colonna.C)).getPosizione(), new Posizione(Posizione.Riga.R3, Posizione.Colonna.C));
+//        p.muovi(p.trovaPezzo(new Posizione(Posizione.Riga.R7, Posizione.Colonna.C)).getPosizione(), new Posizione(Posizione.Riga.R5, Posizione.Colonna.C));
+//        p.muovi(p.trovaPezzo(new Posizione(Posizione.Riga.R3, Posizione.Colonna.C)).getPosizione(), new Posizione(Posizione.Riga.R4, Posizione.Colonna.C));
+//        p.muovi(p.trovaPezzo(new Posizione(Posizione.Riga.R5, Posizione.Colonna.C)).getPosizione(), new Posizione(Posizione.Riga.R4, Posizione.Colonna.B));
+//        System.out.println(Coding.encoding(p.getMossePartita()));
     }
 }

@@ -18,6 +18,11 @@ public class Pezzo {
     private Posizione posizione;
     private ArrayList<Mossa> mosse;
 
+    public Pezzo(Simbolo simbolo, Colore colore){
+        this.simbolo = simbolo;
+        this.colore = colore;
+    }
+    
     public Pezzo(Colore colore, Simbolo simbolo, Posizione posizione) {
         this.colore = colore;
         this.simbolo = simbolo;
@@ -35,7 +40,6 @@ public class Pezzo {
             this.mosse = copiaArray(mosse);
         }
     }
-    
 
     public Colore getColore() {
         return colore;

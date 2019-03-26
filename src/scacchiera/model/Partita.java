@@ -34,15 +34,16 @@ public class Partita {
         posizioniIniziali();
     }
 
-    public Partita(ArrayList<Pezzo> bianchi, ArrayList<Pezzo> neri) {
-        this.pezziBianchi = copiaArray(bianchi);
-        this.pezziNeri = copiaArray(neri);
-    }
+//    public Partita(ArrayList<Pezzo> bianchi, ArrayList<Pezzo> neri) {
+//        this.pezziBianchi = copiaArray(bianchi);
+//        this.pezziNeri = copiaArray(neri);
+//    }
 
-    public Partita(ArrayList<Pezzo> bianchi, ArrayList<Pezzo> neri, Mossa ultimaMossa) {
+    public Partita(ArrayList<Pezzo> bianchi, ArrayList<Pezzo> neri, Mossa ultimaMossa, ArrayList<Mossa> mossePartita) {
         this.pezziBianchi = copiaArray(bianchi);
         this.pezziNeri = copiaArray(neri);
         this.ultimaMossa = ultimaMossa;
+        this.mossePartita = Pezzo.copiaArray(mossePartita);
     }
 
     public ArrayList<Pezzo> getPezziBianchi() {
@@ -249,7 +250,7 @@ public class Partita {
 
     public boolean arrocco(Pezzo p, Posizione posizioneFin) {
         if (p.getSimbolo() == RE && ((posizioneFin.equals(new Posizione(R1, G)) && p.getColore() == BIANCO) || (posizioneFin.equals(new Posizione(R8, G)) && p.getColore() == NERO))) {
-            Partita partita = new Partita(pezziBianchi, pezziNeri, ultimaMossa);
+            Partita partita = new Partita(pezziBianchi, pezziNeri, ultimaMossa, mossePartita);
             if ((trovaPezzo(new Posizione(p.getPosizione().getRiga(), H)) != null && trovaPezzo(new Posizione(p.getPosizione().getRiga(), H)).getSimbolo() == TORRE && trovaPezzo(new Posizione(p.getPosizione().getRiga(), H)).getMosse().isEmpty()) && p.getMosse().isEmpty() && !isScacco(partita, p.getColore(), new Posizione(p.getPosizione().getRiga(), F)) && !isOccupato(new Posizione(p.getPosizione().getRiga(), F)) && !isScacco(partita, p.getColore(), new Posizione(p.getPosizione().getRiga(), E)) && !isOccupato(posizioneFin)) {
 
                 return true;
@@ -260,7 +261,7 @@ public class Partita {
 
     public boolean arroccoLungo(Pezzo p, Posizione posizioneFin) {
         if (p.getSimbolo() == RE && ((posizioneFin.equals(new Posizione(R1, C)) && p.getColore() == BIANCO) || (posizioneFin.equals(new Posizione(R8, C)) && p.getColore() == NERO))) {
-            Partita partita = new Partita(pezziBianchi, pezziNeri, ultimaMossa);
+            Partita partita = new Partita(pezziBianchi, pezziNeri, ultimaMossa, mossePartita);
             if ((trovaPezzo(new Posizione(p.getPosizione().getRiga(), A)) != null && trovaPezzo(new Posizione(p.getPosizione().getRiga(), A)).getSimbolo() == TORRE && trovaPezzo(new Posizione(p.getPosizione().getRiga(), A)).getMosse().isEmpty()) && p.getMosse().isEmpty() && !isScacco(partita, p.getColore(), new Posizione(p.getPosizione().getRiga(), D)) && !isOccupato(new Posizione(p.getPosizione().getRiga(), D)) && !isScacco(partita, p.getColore(), new Posizione(p.getPosizione().getRiga(), E)) && !isOccupato(new Posizione(p.getPosizione().getRiga(), B)) && !isOccupato(posizioneFin) && !isScacco(partita, p.getColore(), new Posizione(p.getPosizione().getRiga(), C))) {
                 return true;
             }
@@ -320,35 +321,10 @@ public class Partita {
         }
         for (Posizione p : mossePossibiliConSacco(pez)) {
             if (p.equals(pos2)) {
-                if (enPassant(pez, pos2)) {
-                    if (pez.getColore() == BIANCO) {
-                        for (Pezzo pezzo : pezziNeri) {
-                            if (pezzo.getPosizione().equals(ultimaMossa.getPosFin())) {
-                                pezziNeri.remove(pezzo);
-                                break;
-                            }
-                        }
-                    } else {
-                        for (Pezzo pezzo : pezziBianchi) {
-                            if (pezzo.getPosizione().equals(ultimaMossa.getPosFin())) {
-                                pezziBianchi.remove(pezzo);
-                                break;
-                            }
-                        }
-                    }
-                }
-                ultimaMossa = new Mossa(pos1, pos2);
-                sposta(pez, pos2);
-                trovaPezzo(pos2).getMosse().add(new Mossa(pos1, pos2));
-                if (ultimaMossa != null) {
-                    if ((ultimaMossa.equals(new Mossa(new Posizione(R1, E), new Posizione(R1, G))) && pez.getSimbolo() == RE) || (ultimaMossa.equals(new Mossa(new Posizione(R8, E), new Posizione(R8, G))) && pez.getSimbolo() == RE)) {
-                        trovaPezzo(new Posizione(pos2.getRiga(), H)).setPosizione(new Posizione(pos2.getRiga(), F));
-                    }
-                    if ((ultimaMossa.equals(new Mossa(new Posizione(R1, E), new Posizione(R1, C))) && pez.getSimbolo() == RE) || (ultimaMossa.equals(new Mossa(new Posizione(R8, E), new Posizione(R8, C))) && pez.getSimbolo() == RE)) {
-                        trovaPezzo(new Posizione(pos2.getRiga(), A)).setPosizione(new Posizione(pos2.getRiga(), D));
-                    }
-                }
                 mossePartita.add(new Mossa(pos1, pos2));
+                sposta(pez, pos2);
+                ultimaMossa = new Mossa(pos1, pos2);
+                trovaPezzo(pos2).getMosse().add(new Mossa(pos1, pos2));
                 if (turnoCorrente == BIANCO) {
                     turnoCorrente = NERO;
                 } else {
@@ -488,14 +464,14 @@ public class Partita {
 
     public ArrayList<Posizione> mossePossibiliConSacco(Pezzo p) {
         ArrayList<Posizione> a = new ArrayList<>();
-        Partita partita = new Partita(pezziBianchi, pezziNeri, ultimaMossa);
+        Partita partita = new Partita(pezziBianchi, pezziNeri, ultimaMossa, mossePartita);
         ArrayList<Posizione> mosse = partita.mossePossibili(p);
         for (Posizione posizione : mosse) {
             partita.sposta(partita.trovaPezzo(p.getPosizione()), posizione);
             if (pedineScacco(partita, p.getColore()).isEmpty()) {
                 a.add(posizione);
             }
-            partita = new Partita(pezziBianchi, pezziNeri, ultimaMossa);
+            partita = new Partita(pezziBianchi, pezziNeri, ultimaMossa, mossePartita);
         }
         return a;
     }
@@ -545,6 +521,31 @@ public class Partita {
     }
 
     public void sposta(Pezzo p, Posizione pos) {
+        if (enPassant(p, pos)) {
+            if (p.getColore() == BIANCO) {
+                for (Pezzo pezzo : pezziNeri) {
+                    if (pezzo.getPosizione().equals(new Posizione(Riga.values()[pos.getRiga().ordinal() - 1], pos.getColonna()))) {
+                        pezziNeri.remove(pezzo);
+                        break;
+                    }
+                }
+            } else {
+                for (Pezzo pezzo : pezziBianchi) {
+                    if (pezzo.getPosizione().equals(new Posizione(Riga.values()[pos.getRiga().ordinal() + 1], pos.getColonna()))) {
+                        pezziBianchi.remove(pezzo);
+                        break;
+                    }
+                }
+            }
+        }
+        if (mossePartita.size() > 1 && mossePartita.get(mossePartita.size()-1) != null) {
+            if ((mossePartita.get(mossePartita.size()-1).equals(new Mossa(new Posizione(R1, E), new Posizione(R1, G))) && p.getSimbolo() == RE) || (mossePartita.get(mossePartita.size()-1).equals(new Mossa(new Posizione(R8, E), new Posizione(R8, G))) && p.getSimbolo() == RE)) {
+                trovaPezzo(new Posizione(pos.getRiga(), H)).setPosizione(new Posizione(pos.getRiga(), F));
+            }
+            if ((mossePartita.get(mossePartita.size()-1).equals(new Mossa(new Posizione(R1, E), new Posizione(R1, C))) && p.getSimbolo() == RE) || (mossePartita.get(mossePartita.size()-1).equals(new Mossa(new Posizione(R8, E), new Posizione(R8, C))) && p.getSimbolo() == RE)) {
+                trovaPezzo(new Posizione(pos.getRiga(), A)).setPosizione(new Posizione(pos.getRiga(), D));
+            }
+        }
         if (p.getColore() == BIANCO) {
             if (trovaPezzo(pos) != null) {
                 for (Pezzo pezzo : pezziNeri) {
@@ -579,7 +580,11 @@ public class Partita {
     }
 
     public boolean isScacco(Colore c) {
-        Partita partita = new Partita(pezziBianchi, pezziNeri, ultimaMossa);
+        return !pedineScacco(this, c).isEmpty();
+    }
+
+    public boolean isScaccoMatto(Colore c) {
+        Partita partita = new Partita(pezziBianchi, pezziNeri, ultimaMossa, mossePartita);
         if (pedineScacco(partita, c).isEmpty()) {
             return false;
         }
@@ -591,9 +596,9 @@ public class Partita {
                     if (pedineScacco(partita, c).isEmpty()) {
                         return false;
                     }
-                    partita = new Partita(pezziBianchi, pezziNeri, ultimaMossa);
+                    partita = new Partita(pezziBianchi, pezziNeri, ultimaMossa, mossePartita);
                 }
-                partita = new Partita(pezziBianchi, pezziNeri, ultimaMossa);
+                partita = new Partita(pezziBianchi, pezziNeri, ultimaMossa, mossePartita);
             }
         } else {
             for (Pezzo pezzo : partita.pezziNeri) {
@@ -603,9 +608,9 @@ public class Partita {
                     if (pedineScacco(partita, c).isEmpty()) {
                         return false;
                     }
-                    partita = new Partita(pezziBianchi, pezziNeri, ultimaMossa);
+                    partita = new Partita(pezziBianchi, pezziNeri, ultimaMossa, mossePartita);
                 }
-                partita = new Partita(pezziBianchi, pezziNeri, ultimaMossa);
+                partita = new Partita(pezziBianchi, pezziNeri, ultimaMossa, mossePartita);
             }
         }
         return true;
@@ -641,12 +646,16 @@ public class Partita {
             for (Pezzo p : pezziBianchi) {
                 if (p.getPosizione().getRiga() == R8 && p.getSimbolo() == PEDONE) {
                     p.setSimbolo(promozione);
+                    mossePartita.get(mossePartita.size() - 1).setSimbolo(promozione);
+                    break;
                 }
             }
         } else {
             for (Pezzo p : pezziNeri) {
                 if (p.getPosizione().getRiga() == R1 && p.getSimbolo() == PEDONE) {
                     p.setSimbolo(promozione);
+                    mossePartita.get(mossePartita.size() - 1).setSimbolo(promozione);
+                    break;
                 }
             }
         }
