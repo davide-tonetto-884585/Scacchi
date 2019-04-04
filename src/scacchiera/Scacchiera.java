@@ -20,6 +20,11 @@ public class Scacchiera extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/scacchiera/viewController/FXMLIndex.fxml"));
+
+//        MiaClasse mc = new MiaClasse();
+//        FXMLLoader firstLoader = new FXMLLoader(getClass().getResource("/scacchiera/viewController/FXMLIndex.fxml"));
+//        firstLoader.setController(new FXMLIndexController(mc));
+//        Parent root = firstLoader.load();
         
         Scene scene = new Scene(root);
         

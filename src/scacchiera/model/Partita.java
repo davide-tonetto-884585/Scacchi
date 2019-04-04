@@ -24,21 +24,24 @@ public class Partita {
     private ArrayList<Pezzo> pezziNeri;
     private ArrayList<Mossa> mossePartita;
     private Mossa ultimaMossa;
+    private int regola50Mosse;
+    private ArrayList<String> ripetizioneMosse;
 
     public Partita() {
-        turnoCorrente = Colore.BIANCO;
+        turnoCorrente = BIANCO;
         pezziBianchi = new ArrayList<>();
         pezziNeri = new ArrayList<>();
 //        pezziPos = new HashMap<>();
         mossePartita = new ArrayList<>();
+        ripetizioneMosse = new ArrayList<>();
         posizioniIniziali();
+        codificaScacchiera();
     }
 
 //    public Partita(ArrayList<Pezzo> bianchi, ArrayList<Pezzo> neri) {
 //        this.pezziBianchi = copiaArray(bianchi);
 //        this.pezziNeri = copiaArray(neri);
 //    }
-
     public Partita(ArrayList<Pezzo> bianchi, ArrayList<Pezzo> neri, Mossa ultimaMossa, ArrayList<Mossa> mossePartita) {
         this.pezziBianchi = copiaArray(bianchi);
         this.pezziNeri = copiaArray(neri);
@@ -315,6 +318,11 @@ public class Partita {
     }
 
     public boolean muovi(Posizione pos1, Posizione pos2) {
+        if (trovaPezzo(pos2) != null || trovaPezzo(pos1).getSimbolo() == PEDONE) {
+            regola50Mosse = 0;
+        } else {
+            regola50Mosse++;
+        }
         Pezzo pez = trovaPezzo(pos1);
         if (pez.getColore() != turnoCorrente) {
             return false;
@@ -323,6 +331,7 @@ public class Partita {
             if (p.equals(pos2)) {
                 mossePartita.add(new Mossa(pos1, pos2));
                 sposta(pez, pos2);
+                codificaScacchiera();
                 ultimaMossa = new Mossa(pos1, pos2);
                 trovaPezzo(pos2).getMosse().add(new Mossa(pos1, pos2));
                 if (turnoCorrente == BIANCO) {
@@ -538,11 +547,11 @@ public class Partita {
                 }
             }
         }
-        if (mossePartita.size() > 1 && mossePartita.get(mossePartita.size()-1) != null) {
-            if ((mossePartita.get(mossePartita.size()-1).equals(new Mossa(new Posizione(R1, E), new Posizione(R1, G))) && p.getSimbolo() == RE) || (mossePartita.get(mossePartita.size()-1).equals(new Mossa(new Posizione(R8, E), new Posizione(R8, G))) && p.getSimbolo() == RE)) {
+        if (mossePartita.size() > 1 && mossePartita.get(mossePartita.size() - 1) != null) {
+            if ((mossePartita.get(mossePartita.size() - 1).equals(new Mossa(new Posizione(R1, E), new Posizione(R1, G))) && p.getSimbolo() == RE) || (mossePartita.get(mossePartita.size() - 1).equals(new Mossa(new Posizione(R8, E), new Posizione(R8, G))) && p.getSimbolo() == RE)) {
                 trovaPezzo(new Posizione(pos.getRiga(), H)).setPosizione(new Posizione(pos.getRiga(), F));
             }
-            if ((mossePartita.get(mossePartita.size()-1).equals(new Mossa(new Posizione(R1, E), new Posizione(R1, C))) && p.getSimbolo() == RE) || (mossePartita.get(mossePartita.size()-1).equals(new Mossa(new Posizione(R8, E), new Posizione(R8, C))) && p.getSimbolo() == RE)) {
+            if ((mossePartita.get(mossePartita.size() - 1).equals(new Mossa(new Posizione(R1, E), new Posizione(R1, C))) && p.getSimbolo() == RE) || (mossePartita.get(mossePartita.size() - 1).equals(new Mossa(new Posizione(R8, E), new Posizione(R8, C))) && p.getSimbolo() == RE)) {
                 trovaPezzo(new Posizione(pos.getRiga(), A)).setPosizione(new Posizione(pos.getRiga(), D));
             }
         }
@@ -692,5 +701,112 @@ public class Partita {
             }
         }
         return false;
+    }
+
+    public boolean isStallo(Colore c) {
+        if (isScacco(c)) {
+            return false;
+        }
+        if (c == BIANCO) {
+            for (Pezzo p : pezziBianchi) {
+                if(!mossePossibiliConSacco(p).isEmpty()){
+                    return false;
+                }
+            }
+        } else {
+            for(Pezzo p : pezziNeri){
+                if(!mossePossibiliConSacco(p).isEmpty()){
+                    return false;
+                }
+            }
+        }
+        return true; 
+    }
+
+    /**
+     * indica se la partita è finita
+     *
+     * @return
+     */
+    public boolean isFinita() {
+        if (isStallo(NERO) || isStallo(BIANCO)) {
+            return true;
+        }
+        if (isScaccoMatto(NERO) || isScaccoMatto(BIANCO)) {
+            return true;
+        }
+        if (regola50Mosse == 100) {
+            return true;
+        }
+        if (isRipetizioneScacchiera()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * indica come è finita la partita null se non è finita
+     *
+     * @return
+     */
+    public String comeEFinita() {
+        if (isStallo(NERO) || isStallo(BIANCO)) {
+            return "stallo";
+        }
+        if (isScaccoMatto(NERO) || isScaccoMatto(BIANCO)) {
+            return "scacco matto";
+        }
+        if (regola50Mosse == 100) {
+            return "regola delle 50 mosse";
+        }
+        if (isRipetizioneScacchiera()) {
+            return "ripetizione di mosse";
+        }
+        return null;
+    }
+
+    public Colore vincitore() {
+        if (isStallo(BIANCO) || isStallo(NERO)) {
+            return null;
+        }
+        if(isScaccoMatto(BIANCO)){
+            return NERO;
+        }
+        if(isScaccoMatto(NERO)){
+            return BIANCO;
+        }
+        if(regola50Mosse == 100){
+            return null;
+        }
+        if(isRipetizioneScacchiera()){
+            return null;
+        }
+        return null;
+    }
+
+    private void codificaScacchiera() {
+        StringBuilder sb = new StringBuilder();
+        for (Riga r : Riga.values()) {
+            for (Colonna c : Colonna.values()) {
+                Pezzo p = trovaPezzo(new Posizione(r, c));
+                if (p == null) {
+                    sb.append('x');
+                } else {
+                    sb.append(p.getSimbolo().getCodingSimbol());
+                }
+            }
+        }
+        ripetizioneMosse.add(sb.toString());
+    }
+
+    private boolean isRipetizioneScacchiera() {
+        String ultimaConfigurazione = ripetizioneMosse.get(ripetizioneMosse.size() - 1);
+        int cont = 0;
+        for (String s : ripetizioneMosse) {
+            if (s.equals(ultimaConfigurazione)) {
+                cont++;
+            }
+        }
+        return cont == 3;
     }
 }

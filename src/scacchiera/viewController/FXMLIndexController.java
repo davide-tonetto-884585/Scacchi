@@ -14,6 +14,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.RadioButton;
@@ -41,31 +43,30 @@ public class FXMLIndexController implements Initializable {
             alert.setTitle("Errore.");
             alert.setContentText("Seleziona un'opzione.");
             alert.showAndWait();
-        } else if (((RadioButton)radio.getSelectedToggle()).getText().equals("Multigiocatore in locale")) {
+        } else if (((RadioButton) radio.getSelectedToggle()).getText().equals("Multigiocatore in locale")) {
             try {
+                Node node = (Node) event.getSource();
+                Stage stage = (Stage) node.getScene().getWindow();
                 FXMLLoader fxmlLoader = new FXMLLoader();
                 fxmlLoader.setLocation(getClass().getResource("FXMLDocument.fxml"));
-                Scene scene = new Scene(fxmlLoader.load(), 971, 594);
-//                Scene scene = (Scene) event.getSource();
-//                scene.getWindow().setX(971);
-//                scene.getWindow().setY(594);
-                Stage stage = new Stage();
-                stage.setTitle("Chess");
-                stage.setScene(scene);
-                stage.show();
+                Scene scene = stage.getScene();
+                node.getScene().getWindow().setHeight(594 + 39);
+                node.getScene().getWindow().setWidth(971 + 16);
+                scene.setRoot((Parent) fxmlLoader.load());
             } catch (IOException e) {
                 Logger logger = Logger.getLogger(getClass().getName());
                 logger.log(Level.SEVERE, "Failed to create new Window.", e);
             }
-        } else{
+        } else {
             try {
+                Node node = (Node) event.getSource();
+                Stage stage = (Stage) node.getScene().getWindow();
                 FXMLLoader fxmlLoader = new FXMLLoader();
                 fxmlLoader.setLocation(getClass().getResource("FXMLConnection.fxml"));
-                Scene scene = new Scene(fxmlLoader.load(), 600, 400);
-                Stage stage = new Stage();
-                stage.setTitle("Gestione partita");
-                stage.setScene(scene);
-                stage.show();
+                Scene scene = stage.getScene();
+                node.getScene().getWindow().setHeight(400 + 39);
+                node.getScene().getWindow().setWidth(600 + 16);
+                scene.setRoot((Parent) fxmlLoader.load());
             } catch (IOException e) {
                 Logger logger = Logger.getLogger(getClass().getName());
                 logger.log(Level.SEVERE, "Failed to create new Window.", e);

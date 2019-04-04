@@ -13,6 +13,8 @@ import scacchiera.model.Partita;
 import scacchiera.model.Pezzo;
 import scacchiera.model.Posizione;
 import scacchiera.model.Posizione.*;
+import static scacchiera.model.Posizione.Colonna.*;
+import static scacchiera.model.Posizione.Riga.*;
 import static scacchiera.model.Simbolo.*;
 
 /**
@@ -111,7 +113,7 @@ public class Coding {
         for (String s : array) {
             if (!s.contains(".")) {
 
-                //pezzo iniziale
+                //pezzo iniziale 
             }
             giri++;
         }
@@ -206,10 +208,10 @@ public class Coding {
         Colonna col = null;
         Riga rig = null;
         int stato = 0;
-        for (char c : s.toCharArray()) {
+        for (int c = 0; c < s.length(); c++) {
             switch (stato) {
                 case 0:
-                    switch (c) {
+                    switch (s.charAt(c)) {
                         case 'a':
                         case 'b':
                         case 'c':
@@ -229,10 +231,25 @@ public class Coding {
                         case '7':
                         case '8':
                             stato = 2;
+                            break;
+                        case '0':
+                            if (s.length() == 3) {
+                                if (p.getColore() == BIANCO) {
+                                    p.setPosizione(new Posizione(R1, G));
+                                } else {
+                                    p.setPosizione(new Posizione(R8, G));
+                                }
+                            } else {
+                                if (p.getColore() == BIANCO) {
+                                    p.setPosizione(new Posizione(R1, C));
+                                } else {
+                                    p.setPosizione(new Posizione(R8, C));
+                                }
+                            }
                     }
                     break;
                 case 1: // gestione colonna
-                    switch(c){
+                    switch (s.charAt(c)) {
                         case 'a':
                         case 'b':
                         case 'c':
@@ -242,10 +259,42 @@ public class Coding {
                         case 'g':
                         case 'h':
                         case 'x':
-                            
+                            col = Colonna.getFromChar(s.charAt(c - 1));
+                            break;
+                        case '1':
+                        case '2':
+                        case '3':
+                        case '4':
+                        case '5':
+                        case '6':
+                        case '7':
+                        case '8':
+                            if (c < s.length() - 2) {
+                                col = Colonna.getFromChar(s.charAt(c - 1));
+                                rig = Riga.values()[Integer.parseInt(s, c)];
+                            } else {
+                                p.setPosizione(new Posizione(Riga.values()[Integer.parseInt(s, c)], Colonna.getFromChar(s.charAt(c - 1))));
+                            }
+                            stato = 2;
+                    }
+                    break;
+                case 2: //gestione riga
+                    switch (s.charAt(c)) {
+                        case 'a':
+                        case 'b':
+                        case 'c':
+                        case 'd':
+                        case 'e':
+                        case 'f':
+                        case 'g':
+                        case 'h':
+                        case 'x':
+                            rig = Riga.values()[Integer.parseInt(s, c - 1)];
+                            break;
                     }
             }
         }
+        
         return null;
     }
 }

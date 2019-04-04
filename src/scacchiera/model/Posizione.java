@@ -79,6 +79,19 @@ public class Posizione {
             this.simbolo = simbolo;
         }
 
+        public char getSimbolo(){
+            return simbolo;
+        }
+        
+        public static Colonna getFromChar(char simbolo){
+            for(Colonna c : Colonna.values()){
+                if(c.getSimbolo() == simbolo){
+                    return c;
+                }
+            }
+            return null;
+        }
+        
         @Override
         public String toString() {
             return Character.toString(simbolo);

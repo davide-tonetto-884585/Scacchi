@@ -5,21 +5,13 @@
  */
 package scacchiera.viewController;
 
-import java.io.IOException;
-import java.net.InetAddress;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import scacchiera.model.UDP.*;
 
 /**
@@ -43,8 +35,7 @@ public class FXMLConnectionController extends ComunicazioneUDP implements Initia
         try {
             Server server = new Server();
             label2.setText("Connessione stabilita");
-            showCustomerDialog(server.getIp());
-            
+//            showCustomerDialog(server.getIp());
         } catch (ConnessioneException ex) {
             label2.setText("Connessione fallita.");
         }
@@ -57,9 +48,7 @@ public class FXMLConnectionController extends ComunicazioneUDP implements Initia
         if (controlloIP(ip.getText())) {
             try {
                 client = new Client(ip.getText());
-                label.setText("Connessione stabilita.");
-
-                showCustomerDialog(client.getIp());    
+                label.setText("Connessione stabilita.");  
             } catch (ConnessioneException ex) {
                 label.setText("Connessione fallita.");
             }
@@ -68,19 +57,19 @@ public class FXMLConnectionController extends ComunicazioneUDP implements Initia
         }
     }
 
-    public Stage showCustomerDialog(InetAddress ip) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("FXMLChessOnline.fxml"));
-
-        Stage stage = new Stage(StageStyle.DECORATED);
-        stage.setScene(new Scene((Pane) loader.load()));
-
-        FXMLChessOnlineController controller = loader.<FXMLChessOnlineController>getController();
-        controller.setIp(ip);
-        
-        stage.show();
-        
-        return stage;
-    }
+//    public Stage showCustomerDialog(InetAddress ip) throws IOException {
+//        FXMLLoader loader = new FXMLLoader(getClass().getResource("FXMLChessOnline.fxml"));
+//
+//        Stage stage = new Stage(StageStyle.DECORATED);
+//        stage.setScene(new Scene((Pane) loader.load()));
+//
+//        FXMLChessOnlineController controller = loader.<FXMLChessOnlineController>getController();
+//        controller.setIp(ip);
+//        
+//        stage.show();
+//        
+//        return stage;
+//    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
