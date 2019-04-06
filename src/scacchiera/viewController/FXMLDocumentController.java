@@ -58,45 +58,47 @@ public class FXMLDocumentController implements Initializable {
     private Posizione pos1, pos2;
     private Colore versoScacchiera;
     private static final double DIM_SC = 1080;
+    private GraphicsContext graphics3;
+    private GraphicsContext graphics2;
+    private GraphicsContext graphics1;
 
     @FXML
     void guida(MouseEvent event) {
 //        turno.setText(p.getTurnoCorrente().toString());
-//        double sx = 0, sy = 0, sw = 200, sh = 200, dx = 0, dy = 0, dw = 64, dh = 64;
-//        GraphicsContext graphics = canvas2.getGraphicsContext2D();
-//        Image img = new Image("/scacchiera/viewController/res/imgs/puntatore.png");
-//        Image img2 = new Image("/scacchiera/viewController/res/imgs/puntatoreRosso.png");
-//        graphics.clearRect(0, 0, 600, 600);
-//        if (event.getSceneX() - 46 < 0 || event.getSceneY() - 46 < 0 || event.getSceneX() - 46 > 504 || event.getSceneY() - 46 > 504) {
-//            cella.setText("Cursore fuori dalla scacchiera.");
-//        } else {
-//            Posizione pos = null;
-//            if (versoScacchiera == Colore.BIANCO) {
-//                pos = new Posizione(Riga.values()[7 - ((int) ((event.getSceneY() - 49) / (504 / 8)))], Colonna.values()[(int) ((event.getSceneX() - 47) / (504 / 8))]);
-//            } else {
-//                pos = new Posizione(Riga.values()[(int) ((event.getSceneY() - 47) / (504 / 8))], Colonna.values()[7 - ((int) ((event.getSceneX() - 47) / (504 / 8)))]);
-//            }
-//            cella.setText(pos.getColonna().toString() + ", " + pos.getRiga().toString());
-//            if (p.trovaPezzo(pos) != null && p.trovaPezzo(pos).getColore() == p.getTurnoCorrente()) {
-//                if (p.trovaPezzo(pos) != null) {
-//                    ArrayList<Posizione> posizioni = p.mossePossibiliConSacco(p.trovaPezzo(pos));
-//                    for (Posizione posizione : posizioni) {
-//                        if (versoScacchiera == Colore.BIANCO) {
-//                            dy = (7 - posizione.getRiga().ordinal()) * (504 / 8) + 49;
-//                            dx = posizione.getColonna().ordinal() * (504 / 8) + 46;
-//                        } else {
-//                            dy = posizione.getRiga().ordinal() * (504 / 8) + 47;
-//                            dx = (7 - posizione.getColonna().ordinal()) * (504 / 8) + 47;
-//                        }
-//                        if (p.isOccupato(posizione)) {
-//                            graphics.drawImage(img2, sx, sy, sw, sh, dx, dy, dw, dh);
-//                        } else {
-//                            graphics.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
-//                        }
-//                    }
-//                }
-//            }
-//        }
+        double sx = 0, sy = 0, sw = 200, sh = 200, dx = 0, dy = 0, dw = 64, dh = 64;
+        Image img = new Image("/scacchiera/viewController/res/imgs/puntatore.png");
+        Image img2 = new Image("/scacchiera/viewController/res/imgs/puntatoreRosso.png");
+        graphics2.clearRect(0, 0, 600, 600);
+        if (event.getSceneX() - 46 < 0 || event.getSceneY() - 46 < 0 || event.getSceneX() - 46 > 504 || event.getSceneY() - 46 > 504) {
+            cella.setText("Cursore fuori dalla scacchiera.");
+        } else {
+            Posizione pos = null;
+            if (versoScacchiera == Colore.BIANCO) {
+                pos = new Posizione(Riga.values()[7 - ((int) ((event.getSceneY() - 49) / (504 / 8)))], Colonna.values()[(int) ((event.getSceneX() - 47) / (504 / 8))]);
+            } else {
+                pos = new Posizione(Riga.values()[(int) ((event.getSceneY() - 47) / (504 / 8))], Colonna.values()[7 - ((int) ((event.getSceneX() - 47) / (504 / 8)))]);
+            }
+            cella.setText(pos.getColonna().toString() + ", " + pos.getRiga().toString());
+            if (p.trovaPezzo(pos) != null && p.trovaPezzo(pos).getColore() == p.getTurnoCorrente()) {
+                if (p.trovaPezzo(pos) != null) {
+                    ArrayList<Posizione> posizioni = p.mossePossibiliConSacco(p.trovaPezzo(pos));
+                    for (Posizione posizione : posizioni) {
+                        if (versoScacchiera == Colore.BIANCO) {
+                            dy = (7 - posizione.getRiga().ordinal()) * (504 / 8) + 49;
+                            dx = posizione.getColonna().ordinal() * (504 / 8) + 46;
+                        } else {
+                            dy = posizione.getRiga().ordinal() * (504 / 8) + 47;
+                            dx = (7 - posizione.getColonna().ordinal()) * (504 / 8) + 47;
+                        }
+                        if (p.isOccupato(posizione)) {
+                            graphics2.drawImage(img2, sx, sy, sw, sh, dx, dy, dw, dh);
+                        } else {
+                            graphics2.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @FXML
@@ -147,53 +149,41 @@ public class FXMLDocumentController implements Initializable {
                         graphics2.clearRect(0, 0, 600, 600);
                         pos1 = null;
                         pos2 = null;
-//                        System.out.println("Scacco bianchi " + p.isScacco(Colore.BIANCO));
-//                        System.out.println("Scacco neri " + p.isScacco(Colore.NERO));
-                        if (p.isScaccoMatto(Colore.BIANCO)) {
+
+                        //controllo fine partita
+                        if (p.isFinita()) {
                             Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                            alert.setTitle("Scacco Matto!");
-                            alert.setContentText("il nero ha vinto!");
-                            alert.showAndWait();
-                        } else if (p.isScaccoMatto(Colore.NERO)) {
-                            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                            alert.setTitle("Scacco Matto!");
-                            alert.setContentText("il bianco ha vinto!");
+                            alert.setTitle("Partita conclusa!");
+                            if (p.vincitore() != null) {
+                                alert.setContentText("il " + p.vincitore() + " ha vinto per " + p.comeEFinita());
+                            } else {
+                                alert.setContentText("La partita è patta per " + p.comeEFinita());
+                            }
                             alert.showAndWait();
                         }
-                        Alert alert = new Alert(Alert.AlertType.NONE);
-                        ButtonType REGINA = new ButtonType("Regina");
-                        ButtonType ALFIERE = new ButtonType("Alfiere");
-                        ButtonType TORRE = new ButtonType("Torre");
-                        ButtonType CAVALLO = new ButtonType("Cavallo");
-                        alert.getButtonTypes().addAll(REGINA, ALFIERE, CAVALLO, TORRE);
-                        alert.setTitle("Promozione");
-                        alert.setHeaderText("Promozione pedone!");
-                        alert.setContentText("Seleziona un pezzo:");
-                        if (p.isPromozione(Colore.BIANCO)) {
+
+                        //controllo promozione
+                        Colore promozione = p.isPromozione();
+                        if (promozione != null) {
+                            Alert alert = new Alert(Alert.AlertType.NONE);
+                            ButtonType REGINA = new ButtonType("Regina");
+                            ButtonType ALFIERE = new ButtonType("Alfiere");
+                            ButtonType TORRE = new ButtonType("Torre");
+                            ButtonType CAVALLO = new ButtonType("Cavallo");
+                            alert.getButtonTypes().addAll(REGINA, ALFIERE, CAVALLO, TORRE);
+                            alert.setTitle("Promozione");
+                            alert.setHeaderText("Promozione pedone!");
+                            alert.setContentText("Seleziona un pezzo:");
                             Optional<ButtonType> result = alert.showAndWait();
                             if (result.isPresent()) {
                                 if (result.get() == REGINA) {
-                                    p.promuovi(Simbolo.REGINA, Colore.BIANCO);
+                                    p.promuovi(Simbolo.REGINA, promozione);
                                 } else if (result.get() == CAVALLO) {
-                                    p.promuovi(Simbolo.CAVALLO, Colore.BIANCO);
+                                    p.promuovi(Simbolo.CAVALLO, promozione);
                                 } else if (result.get() == ALFIERE) {
-                                    p.promuovi(Simbolo.ALFIERE, Colore.BIANCO);
+                                    p.promuovi(Simbolo.ALFIERE, promozione);
                                 } else {
-                                    p.promuovi(Simbolo.TORRE, Colore.BIANCO);
-                                }
-                                aggiornaScacchiera();
-                            }
-                        } else if (p.isPromozione(Colore.NERO)) {
-                            Optional<ButtonType> result = alert.showAndWait();
-                            if (result.isPresent()) {
-                                if (result.get() == REGINA) {
-                                    p.promuovi(Simbolo.REGINA, Colore.BIANCO);
-                                } else if (result.get() == CAVALLO) {
-                                    p.promuovi(Simbolo.CAVALLO, Colore.BIANCO);
-                                } else if (result.get() == ALFIERE) {
-                                    p.promuovi(Simbolo.ALFIERE, Colore.BIANCO);
-                                } else {
-                                    p.promuovi(Simbolo.TORRE, Colore.BIANCO);
+                                    p.promuovi(Simbolo.TORRE, promozione);
                                 }
                                 aggiornaScacchiera();
                             }
@@ -206,6 +196,9 @@ public class FXMLDocumentController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        graphics1 = canvas.getGraphicsContext2D();
+        graphics2 = canvas2.getGraphicsContext2D();
+        graphics3 = canvas3.getGraphicsContext2D();
         pos1 = null;
         pos2 = null;
         p = new Partita();
@@ -216,10 +209,9 @@ public class FXMLDocumentController implements Initializable {
     }
 
     public void aggiornaScacchiera() {
-        GraphicsContext graphics = canvas.getGraphicsContext2D();
         Image img = new Image("/scacchiera/viewController/res/imgs/figure2.png");
         double dx, dy, width = img.getWidth() / 6, height = img.getHeight() / 2, sx, sy, dw = 62, dh = 62;
-        graphics.clearRect(0, 0, 600, 600);
+        graphics1.clearRect(0, 0, 600, 600);
         if (pos1 != null && pos2 != null) {
             azioni.appendText(p.getTurnoCorrente().toString() + ": spostato " + p.trovaPezzo(pos2).getSimbolo().toString() + " da " + pos1.getColonna().toString() + ", " + pos1.getRiga().toString() + " a " + pos2.getColonna().toString() + ", " + pos2.getRiga().toString() + ";\n");
 //            p.muovi(pos1, pos2);
@@ -233,23 +225,22 @@ public class FXMLDocumentController implements Initializable {
             if (versoScacchiera == Colore.BIANCO) {
                 dy = (7 - pezzo.getPosizione().getRiga().ordinal()) * (504 / 8) + 49;
                 dx = pezzo.getPosizione().getColonna().ordinal() * (504 / 8) + 46;
-                graphics.drawImage(img, sx, sy, width, height, dx, dy, dw, dh);
+                graphics1.drawImage(img, sx, sy, width, height, dx, dy, dw, dh);
             } else {
                 dy = pezzo.getPosizione().getRiga().ordinal() * (504 / 8) + 47;
                 dx = (7 - pezzo.getPosizione().getColonna().ordinal()) * (504 / 8) + 47;
-                graphics.drawImage(img, sx, sy, width, height, dx, dy, dw, dh);
+                graphics1.drawImage(img, sx, sy, width, height, dx, dy, dw, dh);
             }
         }
     }
 
     private void mostraGuida(Posizione pos) {
         double sx = 0, sy = 0, sw = 200, sh = 200, dx = 0, dy = 0, dw = 64, dh = 64;
-        GraphicsContext graphics = canvas3.getGraphicsContext2D();
         Image img = new Image("/scacchiera/viewController/res/imgs/puntatore.png");
         Image img2 = new Image("/scacchiera/viewController/res/imgs/puntatoreRosso.png");
         Image img3 = new Image("/scacchiera/viewController/res/imgs/puntatoreVerde.png");
         if (pos2 != null) {
-            graphics.clearRect(dx, dy, 600, 600);
+            graphics3.clearRect(dx, dy, 600, 600);
         }
         if (versoScacchiera == Colore.BIANCO) {
             dy = (7 - pos.getRiga().ordinal()) * (504 / 8) + 49;
@@ -258,7 +249,7 @@ public class FXMLDocumentController implements Initializable {
             dy = pos.getRiga().ordinal() * (504 / 8) + 47;
             dx = (7 - pos.getColonna().ordinal()) * (504 / 8) + 47;
         }
-        graphics.drawImage(img3, sx, sy, sw, sh, dx, dy, dw, dh);
+        graphics3.drawImage(img3, sx, sy, sw, sh, dx, dy, dw, dh);
         ArrayList<Posizione> posizioni = p.mossePossibiliConSacco(p.trovaPezzo(pos));
         for (Posizione posizione : posizioni) {
             if (versoScacchiera == Colore.BIANCO) {
@@ -269,9 +260,9 @@ public class FXMLDocumentController implements Initializable {
                 dx = (7 - posizione.getColonna().ordinal()) * (504 / 8) + 47;
             }
             if (p.isOccupato(posizione)) {
-                graphics.drawImage(img2, sx, sy, sw, sh, dx, dy, dw, dh);
+                graphics3.drawImage(img2, sx, sy, sw, sh, dx, dy, dw, dh);
             } else {
-                graphics.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
+                graphics3.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
             }
         }
     }
@@ -281,8 +272,7 @@ public class FXMLDocumentController implements Initializable {
         p = new Partita();
         pos1 = null;
         pos2 = null;
-        GraphicsContext graphics = canvas3.getGraphicsContext2D();
-        graphics.clearRect(0, 0, 600, 600);
+        graphics3.clearRect(0, 0, 600, 600);
         aggiornaScacchiera();
         azioni.clear();
         stato.setText("Inizio partita.");
@@ -291,8 +281,7 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     void ruotaScacchiera(ActionEvent event) {
-        GraphicsContext graphics = canvas3.getGraphicsContext2D();
-        graphics.clearRect(0, 0, 600, 600);
+        graphics3.clearRect(0, 0, 600, 600);
         scacchiera.setRotate((scacchiera.getRotate() + 180) % 360);
         if (versoScacchiera == Colore.BIANCO) {
             versoScacchiera = Colore.NERO;

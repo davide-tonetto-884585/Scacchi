@@ -5,13 +5,25 @@
  */
 package scacchiera.viewController;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import scacchiera.model.TCP.ThreadRicevi;
 import scacchiera.model.UDP.*;
 
 /**
@@ -31,48 +43,68 @@ public class FXMLConnectionController extends ComunicazioneUDP implements Initia
 
     @FXML
     void avviaServer(ActionEvent event) throws Exception {
-        label2.setText("Attesa giocatore...");
-        try {
-            Server server = new Server();
-            label2.setText("Connessione stabilita");
-//            showCustomerDialog(server.getIp());
-        } catch (ConnessioneException ex) {
-            label2.setText("Connessione fallita.");
-        }
+        new ThreadRicevi(9800).start();
     }
 
     @FXML
     void richiediConnessione(ActionEvent event) throws Exception {
-        Client client = null;
-        label.setText("Ricerca...");
-        if (controlloIP(ip.getText())) {
-            try {
-                client = new Client(ip.getText());
-                label.setText("Connessione stabilita.");  
-            } catch (ConnessioneException ex) {
-                label.setText("Connessione fallita.");
-            }
-        } else {
-            label.setText("IP non valido.");
-        }
+        richiediConnessione(ip.getText(), 9800);
     }
-
-//    public Stage showCustomerDialog(InetAddress ip) throws IOException {
-//        FXMLLoader loader = new FXMLLoader(getClass().getResource("FXMLChessOnline.fxml"));
-//
-//        Stage stage = new Stage(StageStyle.DECORATED);
-//        stage.setScene(new Scene((Pane) loader.load()));
-//
-//        FXMLChessOnlineController controller = loader.<FXMLChessOnlineController>getController();
-//        controller.setIp(ip);
-//        
-//        stage.show();
-//        
-//        return stage;
-//    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+    }
+
+    private void richiediConnessione(String ip, int port) {
+        new ThreadSend(ip, port).start();
+    }
+
+    private class ThreadSend extends Thread {
+
+        private String ip;
+        private int port;
+
+        public ThreadSend(String ip, int port) {
+            this.ip = ip;
+            this.port = port;
+        }
+
+        @Override
+        public void run() {
+            try {
+                Socket socket = new Socket();
+                socket.connect(new InetSocketAddress(ip, port), 1000);
+
+                InputStream inputStream = socket.getInputStream();
+                InputStreamReader isr = new InputStreamReader(inputStream);
+                BufferedReader br = new BufferedReader(isr);
+
+                OutputStream os = socket.getOutputStream();
+                OutputStreamWriter osw = new OutputStreamWriter(os);
+                BufferedWriter bw = new BufferedWriter(osw);
+
+                bw.write("richiesta\n");
+                bw.flush();
+
+                String message = br.readLine();
+
+                if (message.equals("richiesta accettata")) {
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                            alert.setTitle("Connessione effettuata!");
+                            alert.setContentText("Ti sei collegato a " + ip);
+                            alert.showAndWait();
+                        }
+                    });
+                } else if (message.equals("richiesta rifiutata")) {
+                    //TODO messaggi errore
+                }
+            } catch (IOException ex) {
+                System.out.println("errore avvio socket");
+            }
+        }
     }
 }

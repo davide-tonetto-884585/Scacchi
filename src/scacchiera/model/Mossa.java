@@ -44,4 +44,8 @@ public class Mossa {
     public boolean equals(Mossa m){
         return posIni.equals(m.posIni) && posFin.equals(m.posFin);
     }
+    
+    public String toString(){
+        return posIni.toString() + posFin.toString() + (simbolo == null ? 0 : simbolo.ordinal());
+    }
 }

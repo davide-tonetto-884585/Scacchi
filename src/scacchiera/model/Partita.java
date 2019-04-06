@@ -688,6 +688,20 @@ public class Partita {
         }
     }
 
+    public Colore isPromozione() {
+        for (Pezzo p : pezziBianchi) {
+            if (p.getPosizione().getRiga() == R8 && p.getSimbolo() == PEDONE) {
+                return BIANCO;
+            }
+        }
+        for (Pezzo p : pezziNeri) {
+            if (p.getPosizione().getRiga() == R1 && p.getSimbolo() == PEDONE) {
+                return NERO;
+            }
+        }
+        return null;
+    }
+
     public boolean isScacco(Partita p, Colore c, Posizione pos) {
         if (c == BIANCO) {
             p.sposta(p.trovaPezzo(p.trovaRe(p.getPezziBianchi())), pos);
@@ -709,18 +723,18 @@ public class Partita {
         }
         if (c == BIANCO) {
             for (Pezzo p : pezziBianchi) {
-                if(!mossePossibiliConSacco(p).isEmpty()){
+                if (!mossePossibiliConSacco(p).isEmpty()) {
                     return false;
                 }
             }
         } else {
-            for(Pezzo p : pezziNeri){
-                if(!mossePossibiliConSacco(p).isEmpty()){
+            for (Pezzo p : pezziNeri) {
+                if (!mossePossibiliConSacco(p).isEmpty()) {
                     return false;
                 }
             }
         }
-        return true; 
+        return true;
     }
 
     /**
@@ -769,16 +783,16 @@ public class Partita {
         if (isStallo(BIANCO) || isStallo(NERO)) {
             return null;
         }
-        if(isScaccoMatto(BIANCO)){
+        if (isScaccoMatto(BIANCO)) {
             return NERO;
         }
-        if(isScaccoMatto(NERO)){
+        if (isScaccoMatto(NERO)) {
             return BIANCO;
         }
-        if(regola50Mosse == 100){
+        if (regola50Mosse == 100) {
             return null;
         }
-        if(isRipetizioneScacchiera()){
+        if (isRipetizioneScacchiera()) {
             return null;
         }
         return null;
