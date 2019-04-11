@@ -5,10 +5,13 @@
  */
 package scacchiera.viewController;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -23,6 +26,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import scacchiera.model.*;
 import scacchiera.model.Posizione.*;
+import scacchiera.model.TCP.Settings;
 
 /**
  *
@@ -64,7 +68,6 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     void guida(MouseEvent event) {
-//        turno.setText(p.getTurnoCorrente().toString());
         double sx = 0, sy = 0, sw = 200, sh = 200, dx = 0, dy = 0, dw = 64, dh = 64;
         Image img = new Image("/scacchiera/viewController/res/imgs/puntatore.png");
         Image img2 = new Image("/scacchiera/viewController/res/imgs/puntatoreRosso.png");
@@ -209,6 +212,7 @@ public class FXMLDocumentController implements Initializable {
     }
 
     public void aggiornaScacchiera() {
+        turno.setText(p.getTurnoCorrente().toString());
         Image img = new Image("/scacchiera/viewController/res/imgs/figure2.png");
         double dx, dy, width = img.getWidth() / 6, height = img.getHeight() / 2, sx, sy, dw = 62, dh = 62;
         graphics1.clearRect(0, 0, 600, 600);

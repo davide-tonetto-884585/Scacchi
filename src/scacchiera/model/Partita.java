@@ -806,6 +806,7 @@ public class Partita {
                 if (p == null) {
                     sb.append('x');
                 } else {
+                    sb.append(p.getColore() == BIANCO ? 'b' : 'n');
                     sb.append(p.getSimbolo().getCodingSimbol());
                 }
             }

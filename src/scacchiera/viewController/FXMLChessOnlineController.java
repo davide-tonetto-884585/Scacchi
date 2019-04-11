@@ -12,16 +12,20 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 import scacchiera.model.*;
 import scacchiera.model.Posizione.*;
 import scacchiera.model.TCP.Settings;
@@ -31,6 +35,9 @@ import scacchiera.model.TCP.Settings;
  * @author tonetto.davide
  */
 public class FXMLChessOnlineController implements Initializable {
+
+    @FXML
+    private AnchorPane anchorPane;
 
     @FXML
     private ImageView scacchiera;
@@ -53,9 +60,6 @@ public class FXMLChessOnlineController implements Initializable {
     @FXML
     private Label cella;
 
-    @FXML
-    private TextArea azioni;
-
     private Colore player;
     private Partita p;
     private Posizione pos1, pos2;
@@ -67,7 +71,6 @@ public class FXMLChessOnlineController implements Initializable {
 
     @FXML
     void guida(MouseEvent event) {
-        turno.setText(p.getTurnoCorrente().toString());
         double sx = 0, sy = 0, sw = 200, sh = 200, dx = 0, dy = 0, dw = 64, dh = 64;
         Image img = new Image("/scacchiera/viewController/res/imgs/puntatore.png");
         Image img2 = new Image("/scacchiera/viewController/res/imgs/puntatoreRosso.png");
@@ -82,7 +85,7 @@ public class FXMLChessOnlineController implements Initializable {
                 pos = new Posizione(Riga.values()[(int) ((event.getSceneY() - 47) / (504 / 8))], Colonna.values()[7 - ((int) ((event.getSceneX() - 47) / (504 / 8)))]);
             }
             cella.setText(pos.getColonna().toString() + ", " + pos.getRiga().toString());
-            if (p.trovaPezzo(pos) != null && p.trovaPezzo(pos).getColore() == p.getTurnoCorrente()) {
+            if (p.trovaPezzo(pos) != null && p.trovaPezzo(pos).getColore() == p.getTurnoCorrente() && p.trovaPezzo(pos).getColore() == player) {
                 if (p.trovaPezzo(pos) != null) {
                     ArrayList<Posizione> posizioni = p.mossePossibiliConSacco(p.trovaPezzo(pos));
                     for (Posizione posizione : posizioni) {
@@ -116,7 +119,7 @@ public class FXMLChessOnlineController implements Initializable {
                 } else {
                     pos1 = new Posizione(Riga.values()[(int) ((event.getSceneY() - 47) / (504 / 8))], Colonna.values()[7 - ((int) ((event.getSceneX() - 47) / (504 / 8)))]);
                 }
-                if (p.trovaPezzo(pos1) != null && p.trovaPezzo(pos1).getColore() != player) {
+                if (p.trovaPezzo(pos1) != null && p.trovaPezzo(pos1).getColore() != player || p.getTurnoCorrente() != player) {
                     stato.setText("Non è il tuo turno.");
                     graphics3.clearRect(0, 0, 600, 600);
                     pos1 = null;
@@ -147,6 +150,7 @@ public class FXMLChessOnlineController implements Initializable {
                         pos1 = null;
                         pos2 = null;
                     } else {
+                        Mossa m = new Mossa(pos1, pos2);
                         aggiornaScacchiera();
                         graphics3.clearRect(0, 0, 600, 600);
                         pos1 = null;
@@ -180,16 +184,21 @@ public class FXMLChessOnlineController implements Initializable {
                             if (result.isPresent()) {
                                 if (result.get() == REGINA) {
                                     p.promuovi(Simbolo.REGINA, promozione);
+                                    m.setSimbolo(Simbolo.REGINA);
                                 } else if (result.get() == CAVALLO) {
                                     p.promuovi(Simbolo.CAVALLO, promozione);
+                                    m.setSimbolo(Simbolo.CAVALLO);
                                 } else if (result.get() == ALFIERE) {
                                     p.promuovi(Simbolo.ALFIERE, promozione);
+                                    m.setSimbolo(Simbolo.ALFIERE);
                                 } else {
                                     p.promuovi(Simbolo.TORRE, promozione);
+                                    m.setSimbolo(Simbolo.TORRE);
                                 }
                                 aggiornaScacchiera();
                             }
                         }
+                        sendMossa(m);
                     }
                 }
             }
@@ -204,21 +213,35 @@ public class FXMLChessOnlineController implements Initializable {
         pos1 = null;
         pos2 = null;
         p = new Partita();
-        versoScacchiera = Colore.BIANCO;
+        player = Settings.colore;
+        versoScacchiera = Settings.colore;
         aggiornaScacchiera();
         stato.setText("Inizio partita.");
         turno.setText(p.getTurnoCorrente().toString());
         Settings.partita = p;
+        Settings.controller = this;
+
+        if (player == Colore.NERO) {
+            giraScacchiera();
+        }
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Partita avviata!");
+        if (player == Colore.BIANCO) {
+            alert.setContentText("Giochi con i bianchi. Buona fortuna!");
+        } else {
+            alert.setContentText("Giochi con i neri. Buona fortuna!");
+        }
+        alert.show();
     }
 
     public void aggiornaScacchiera() {
+        if (turno != null) {
+            turno.setText(p.getTurnoCorrente().toString());
+        }
         Image img = new Image("/scacchiera/viewController/res/imgs/figure2.png");
         double dx, dy, width = img.getWidth() / 6, height = img.getHeight() / 2, sx, sy, dw = 62, dh = 62;
         graphics1.clearRect(0, 0, 600, 600);
-        if (pos1 != null && pos2 != null) {
-            azioni.appendText(p.getTurnoCorrente().toString() + ": spostato " + p.trovaPezzo(pos2).getSimbolo().toString() + " da " + pos1.getColonna().toString() + ", " + pos1.getRiga().toString() + " a " + pos2.getColonna().toString() + ", " + pos2.getRiga().toString() + ";\n");
-//            p.muovi(pos1, pos2);
-        }
         ArrayList<Pezzo> pedine = new ArrayList<>();
         pedine.addAll(p.getPezziBianchi());
         pedine.addAll(p.getPezziNeri());
@@ -271,13 +294,76 @@ public class FXMLChessOnlineController implements Initializable {
     }
 
     @FXML
+    void richiediPatta(ActionEvent event) {
+        try {
+            Settings.playerWriter.write("richiesta patta\n");
+            Settings.playerWriter.flush();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @FXML
+    void resa(ActionEvent event) {
+        try {
+            Settings.playerWriter.write("resa\n");
+            Settings.playerWriter.flush();
+            pattaOResaAccettata();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @FXML
+    void menuPrincipale(ActionEvent event) {
+        Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+        a.setTitle("Attenzione!");
+        a.setHeaderText("Vuoi abbandonare?");
+        a.setContentText("Se torni al menù principale abbandonerai la partita e ti disconnetterai dal server.");
+        Optional<ButtonType> result = a.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            Stage stage = (Stage) anchorPane.getScene().getWindow();
+            Scene scene = stage.getScene();
+            FXMLLoader fXMLLoader = new FXMLLoader(getClass().getResource("/scacchiera/viewController/FXMLIndex.fxml"));
+            Parent root;
+            try {
+                root = (Parent) fXMLLoader.load();
+                anchorPane.getScene().getWindow().setHeight(400 + 39);
+                anchorPane.getScene().getWindow().setWidth(600 + 16);
+                scene.setRoot(root);
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+            }
+            try {
+                Settings.trr.close();
+            } catch (IOException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+    }
+
+    @FXML
     void restart(ActionEvent event) {
+        try {
+            Settings.playerWriter.write("richiesta restart\n");
+            Settings.playerWriter.flush();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void pattaOResaAccettata() {
+        p.setTurnoCorrente(null);
+    }
+
+    public void restartAccettato() {
         p = new Partita();
+        Settings.partita = p;
+        player = Settings.colore;
         pos1 = null;
         pos2 = null;
         graphics3.clearRect(0, 0, 600, 600);
         aggiornaScacchiera();
-        azioni.clear();
         stato.setText("Inizio partita.");
         turno.setText(p.getTurnoCorrente().toString());
     }
@@ -296,10 +382,16 @@ public class FXMLChessOnlineController implements Initializable {
 
     private void sendMossa(Mossa mossa) {
         try {
-            Settings.playerWriter.write(mossa.toString() + "\n");
+            Settings.playerWriter.write("mossa " + mossa.toString() + "\n");
             Settings.playerWriter.flush();
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
+    }
+
+    private void giraScacchiera() {
+        graphics3.clearRect(0, 0, 600, 600);
+        scacchiera.setRotate((scacchiera.getRotate() + 180) % 360);
+        aggiornaScacchiera();
     }
 }

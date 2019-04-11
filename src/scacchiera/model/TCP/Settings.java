@@ -9,7 +9,10 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import scacchiera.model.Colore;
 import scacchiera.model.Partita;
+import scacchiera.viewController.FXMLChessOnlineController;
+import scacchiera.viewController.FXMLConnectionController;
 
 /**
  *
@@ -23,4 +26,7 @@ public class Settings {
     public static ArrayList<BufferedWriter> bufferedWriters;
     public static ArrayList<BufferedReader> bufferedReaders;
     public static Partita partita;
+    public static Colore colore;
+    public static FXMLChessOnlineController controller;
+    public static FXMLConnectionController.ThreadRiceviRichiesta trr;
 }
