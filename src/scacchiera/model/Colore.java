@@ -10,5 +10,9 @@ package scacchiera.model;
  * @author davide
  */
 public enum Colore {
-    BIANCO, NERO
+    BIANCO, NERO;
+    
+    public Colore notThis() {
+        return this == BIANCO ? NERO : BIANCO;
+    }
 }

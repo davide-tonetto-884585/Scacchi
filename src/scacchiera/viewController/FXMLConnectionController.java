@@ -18,6 +18,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
 import java.util.Optional;
+import java.util.Random;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -32,7 +33,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import scacchiera.model.Colore;
 import static scacchiera.model.Colore.*;
 import scacchiera.model.TCP.Settings;
@@ -56,13 +56,14 @@ public class FXMLConnectionController extends ComunicazioneUDP implements Initia
 
     @FXML
     private TabPane tabPane;
-    
+
     @FXML
     void avviaServer(ActionEvent event) throws Exception {
         Alert alert = new Alert(Alert.AlertType.NONE);
         ButtonType BIANCO = new ButtonType("Bianco");
         ButtonType NERO = new ButtonType("Nero");
-        alert.getButtonTypes().addAll(BIANCO, NERO);
+        ButtonType NULL = new ButtonType("Non cambia nulla");
+        alert.getButtonTypes().addAll(BIANCO, NERO, NULL);
         alert.setTitle("Settings");
         alert.setHeaderText("Selezione schieramento.");
         alert.setContentText("Seleziona un colore:");
@@ -70,8 +71,10 @@ public class FXMLConnectionController extends ComunicazioneUDP implements Initia
         if (result.isPresent()) {
             if (result.get() == BIANCO) {
                 Settings.colore = Colore.BIANCO;
-            } else {
+            } else if (result.get() == NERO) {
                 Settings.colore = Colore.NERO;
+            } else {
+                Settings.colore = null;
             }
         }
         Settings.trr = new ThreadRiceviRichiesta(9800);
@@ -80,7 +83,7 @@ public class FXMLConnectionController extends ComunicazioneUDP implements Initia
 
     @FXML
     void richiediConnessione() throws Exception {
-        richiediConnessione(ip.getText(), 9800);
+        richiediConnessione(ip.getText(), 9800, "richiesta");
     }
 
     @Override
@@ -88,8 +91,8 @@ public class FXMLConnectionController extends ComunicazioneUDP implements Initia
 
     }
 
-    private void richiediConnessione(String ip, int port) {
-        new ThreadSend(ip, port).start();
+    private void richiediConnessione(String ip, int port, String message) {
+        new ThreadSend(ip, port, message).start();
     }
 
     public void inizioPartita() {
@@ -103,15 +106,8 @@ public class FXMLConnectionController extends ComunicazioneUDP implements Initia
             tabPane.getScene().getWindow().setHeight(594 + 39);
             tabPane.getScene().getWindow().setWidth(971 + 16);
             scene.setRoot(root);
-            stage.setOnCloseRequest((WindowEvent event) -> {
-                try {
-                    Settings.trr.close();
-                } catch (IOException ex) {
-                    System.out.println(ex.getMessage());
-                }
-            });
         } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+            ex.printStackTrace();
         }
     }
 
@@ -122,14 +118,39 @@ public class FXMLConnectionController extends ComunicazioneUDP implements Initia
         alert.show();
     }
 
+    @FXML
+    void esc(ActionEvent event) {
+        Stage stage = (Stage) tabPane.getScene().getWindow();
+        Scene scene = stage.getScene();
+        FXMLLoader fXMLLoader = new FXMLLoader(getClass().getResource("/scacchiera/viewController/FXMLIndex.fxml"));
+        Parent root;
+        try {
+            root = (Parent) fXMLLoader.load();
+            tabPane.getScene().getWindow().setHeight(400 + 39);
+            tabPane.getScene().getWindow().setWidth(600 + 16);
+            scene.setRoot(root);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        try {
+            if (Settings.trr != null && Settings.trr.isAlive()) {
+                Settings.trr.close();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
     private class ThreadSend extends Thread {
 
         private String ip;
         private int port;
+        private String message;
 
-        public ThreadSend(String ip, int port) {
+        public ThreadSend(String ip, int port, String message) {
             this.ip = ip;
             this.port = port;
+            this.message = message;
         }
 
         @Override
@@ -146,34 +167,66 @@ public class FXMLConnectionController extends ComunicazioneUDP implements Initia
                 OutputStreamWriter osw = new OutputStreamWriter(os);
                 BufferedWriter bw = new BufferedWriter(osw);
 
-                bw.write("richiesta\n");
+                bw.write(message);
+                bw.newLine();
                 bw.flush();
 
                 String message = br.readLine();
 
-                if (message.equals("richiesta accettata BIANCO")) {
-                    Settings.trr = new ThreadRiceviRichiesta(port);
-                    Settings.player = socket;
-                    Settings.playerReader = br;
-                    Settings.playerWriter = bw;
-                    Settings.colore = NERO;
-                    Platform.runLater(() -> {
-                        alert("Connessione effettuata!", "Ti sei collegato a " + ip, Alert.AlertType.INFORMATION);
+                if (message.equals("richiesta accettata")) {
+                    message = br.readLine();
+                    if (message.equals("bianco") || message.equals("nero")) {
+                        Settings.player = socket;
+                        Settings.playerReader = br;
+                        Settings.playerWriter = bw;
+                        Settings.trr = new ThreadRiceviRichiesta(50000);//TODO Modifica e parametrizza
+                        Settings.trr.start();
+                        if (message.equals("bianco")) {
+                            Settings.colore = BIANCO;
+                        } else if (message.equals("nero")) {
+                            Settings.colore = NERO;
+                        }
+                    } else if (message.equals("richiesta colore")) {
+                        Settings.player = socket;
+                        Settings.playerReader = br;
+                        Settings.playerWriter = bw;
+                        Platform.runLater(() -> {
+                            Alert alert = new Alert(Alert.AlertType.NONE);
+                            ButtonType BIANCO = new ButtonType("Bianco");
+                            ButtonType NERO = new ButtonType("Nero");
+                            ButtonType NULL = new ButtonType("Non cambia nulla");
+                            alert.getButtonTypes().addAll(BIANCO, NERO, NULL);
+                            alert.setTitle("Settings");
+                            alert.setHeaderText("Selezione schieramento.");
+                            alert.setContentText("Seleziona un colore:");
+                            Optional<ButtonType> result = alert.showAndWait();
+                            if (result.get() == BIANCO) {
+                                Settings.colore = Colore.BIANCO;
+                            } else if (result.get() == NERO) {
+                                Settings.colore = Colore.NERO;
+                            } else {
+                                Settings.colore = Colore.values()[Math.abs(new Random().nextInt()) % 2];
+                            }
+                            if (Settings.colore == Colore.BIANCO) {
+                                try {
+                                    Settings.playerWriter.write("nero\n");
+                                    Settings.playerWriter.flush();
+                                } catch (IOException ex) {
+                                    ex.printStackTrace();
+                                }
+                            } else {
+                                try {
+                                    Settings.playerWriter.write("bianco\n");
+                                    Settings.playerWriter.flush();
+                                } catch (IOException ex) {
+                                    ex.printStackTrace();
+                                }
+                            }
+                            alert("Connessione effettuata!", "Ti sei collegato a " + ip, Alert.AlertType.INFORMATION);
 
-                        inizioPartita();
-                    });
-                    new ThreadRicezione().start();
-                } else if (message.equals("richiesta accettata NERO")) {
-                    Settings.trr = new ThreadRiceviRichiesta(port);
-                    Settings.player = socket;
-                    Settings.playerReader = br;
-                    Settings.playerWriter = bw;
-                    Settings.colore = BIANCO;
-                    Platform.runLater(() -> {
-                        alert("Connessione effettuata!", "Ti sei collegato a " + ip, Alert.AlertType.INFORMATION);
-
-                        inizioPartita();
-                    });
+                            inizioPartita();
+                        });
+                    }
                     new ThreadRicezione().start();
                 } else if (message.equals("richiesta rifiutata")) {
                     Platform.runLater(() -> {
@@ -183,18 +236,17 @@ public class FXMLConnectionController extends ComunicazioneUDP implements Initia
                     br.close();
                     bw.close();
                 } else {
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            alert("Errore nella richiesta!", "Ritenta.", Alert.AlertType.ERROR);
-                        }
+                    Platform.runLater(() -> {
+                        alert("Errore nella richiesta!", "Ritenta.", Alert.AlertType.ERROR);
                     });
                     socket.close();
                     br.close();
                     bw.close();
                 }
             } catch (IOException ex) {
-                System.out.println("errore avvio socket");
+                Platform.runLater(() -> {
+                    alert("IP non corretto.", "Reinserisci un IP valido.", Alert.AlertType.ERROR);
+                });
             }
         }
     }
@@ -204,6 +256,7 @@ public class FXMLConnectionController extends ComunicazioneUDP implements Initia
         private int port;
         private final ThreadRicezione tr;
         private boolean isFinito = false;
+        private ServerSocket serverSocket;
 
         public ThreadRiceviRichiesta(int port) {
             this.port = port;
@@ -212,21 +265,22 @@ public class FXMLConnectionController extends ComunicazioneUDP implements Initia
 
         @Override
         public void run() {
-            ServerSocket serverSocket = null;
+            serverSocket = null;
             try {
-                serverSocket = new ServerSocket(9800);
+                serverSocket = new ServerSocket(port);
             } catch (IOException ex) {
-                System.out.println(ex.getMessage());
+                Platform.runLater(() -> {
+                    Alert a = new Alert(Alert.AlertType.ERROR);
+                    a.setTitle("Errore!");
+                    a.setHeaderText("Errore apertura socket.");
+                    a.setContentText("Porta occupata.");
+                    a.show();
+                });
                 return;
             }
             while (true) {
                 try {
                     Socket socket = serverSocket.accept();
-                    
-                    if (isFinito) {
-                        socket.close();
-                        return;
-                    }
 
                     InputStream inputStream = socket.getInputStream();
                     InputStreamReader isr = new InputStreamReader(inputStream);
@@ -240,18 +294,28 @@ public class FXMLConnectionController extends ComunicazioneUDP implements Initia
 
                     if (message.equals("richiesta")) {
                         if (Settings.player == null) {
-                            bw.write("richiesta accettata " + Settings.colore.toString() + "\n");
+                            bw.write("richiesta accettata\n");
                             bw.flush();
                             Settings.player = socket;
                             Settings.playerReader = br;
                             Settings.playerWriter = bw;
-                            Platform.runLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    alert("Avversario trovato!", "Avvio partita.", Alert.AlertType.INFORMATION);
-
-                                    inizioPartita();
+                            if (Settings.colore == null) {
+                                bw.write("richiesta colore\n");
+                                bw.flush();
+                                message = br.readLine();
+                                if (message.equals("bianco")) {
+                                    Settings.colore = BIANCO;
+                                } else {
+                                    Settings.colore = NERO;
                                 }
+                            } else {
+                                bw.write(Settings.colore.notThis().toString().toLowerCase() + "\n");
+                                bw.flush();
+                            }
+                            Platform.runLater(() -> {
+                                alert("Avversario trovato!", "Avvio partita.", Alert.AlertType.INFORMATION);
+
+                                inizioPartita();
                             });
                             tr.start();
                         } else {
@@ -276,6 +340,10 @@ public class FXMLConnectionController extends ComunicazioneUDP implements Initia
                     }
 
                 } catch (IOException ex) {
+                    if (isFinito) {
+                        System.out.println("chiuso ta");
+                        return;
+                    }
                     ex.printStackTrace();
                 }
             }
@@ -287,9 +355,8 @@ public class FXMLConnectionController extends ComunicazioneUDP implements Initia
             if (tr != null && tr.isAlive()) {
                 tr.close();
             }
-            Socket temp = new Socket("localhost", port);
-            temp.close();
-            if (Settings.player != null) {
+            serverSocket.close();
+            if (Settings.player != null && !Settings.player.isClosed()) {
                 Settings.player.close();
             }
             if (Settings.spettatori != null) {
@@ -303,6 +370,8 @@ public class FXMLConnectionController extends ComunicazioneUDP implements Initia
             Settings.playerReader = null;
             Settings.bufferedReaders = null;
             Settings.spettatori = null;
+            Settings.colore = null;
+            Settings.trr = null;
         }
 
         public void setIsFinito(boolean isFinito) {

@@ -5,30 +5,46 @@
  */
 package scacchiera;
 
+import java.io.IOException;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import scacchiera.model.TCP.Settings;
 
 /**
  *
  * @author tonetto.davide
  */
 public class Scacchiera extends Application {
-    
+
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/scacchiera/viewController/FXMLIndex.fxml"));
 
-//        MiaClasse mc = new MiaClasse();
-//        FXMLLoader firstLoader = new FXMLLoader(getClass().getResource("/scacchiera/viewController/FXMLIndex.fxml"));
-//        firstLoader.setController(new FXMLIndexController(mc));
-//        Parent root = firstLoader.load();
-        
         Scene scene = new Scene(root);
-        
+
         stage.setScene(scene);
+        stage.setOnCloseRequest((WindowEvent event) -> {
+            try {
+                if (Settings.trr != null && Settings.trr.isAlive()) {
+                    Settings.trr.close();
+                }
+            } catch (IOException ex) {
+                Platform.runLater(() -> {
+                    Alert a = new Alert(Alert.AlertType.ERROR);
+                    a.setTitle("Errore!");
+                    a.setHeaderText("Errore nella chiusura della partita.");
+                    a.setContentText("Ritenta");
+                    a.show();
+                });
+                event.consume();
+            }
+        });
         stage.show();
     }
 
@@ -38,5 +54,5 @@ public class Scacchiera extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-    
+
 }

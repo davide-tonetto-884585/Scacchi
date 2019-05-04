@@ -7,13 +7,11 @@ package scacchiera.model.TCP;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.net.Socket;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import scacchiera.model.Colore;
 import scacchiera.model.Posizione;
 import scacchiera.model.Posizione.Colonna;
 import scacchiera.model.Posizione.Riga;
@@ -32,7 +30,7 @@ public class ThreadRicezione extends Thread implements Closeable {
         while (true) {
             try {
                 String line = Settings.playerReader.readLine();
-                if (line.length()>4 && line.substring(0, 5).equals("mossa")) {
+                if (line.length() > 4 && line.substring(0, 5).equals("mossa")) {
                     String temp = line.substring(6, line.length());
 
                     Posizione pos1 = new Posizione(Riga.values()[Integer.parseInt(String.valueOf(temp.charAt(1))) - 1], Colonna.getFromChar(temp.charAt(0)));
@@ -149,27 +147,32 @@ public class ThreadRicezione extends Thread implements Closeable {
                         a.show();
                         Settings.controller.pattaOResaAccettata();
                     });
+                } else if (line.equals("bianco")) {
+                    Settings.colore = Colore.BIANCO;
+                } else if (line.equals("nero")) {
+                    Settings.colore = Colore.NERO;
                 } else {
                     System.out.println("errore, message: " + line);
                 }
             } catch (IOException | NullPointerException ex) {
                 if (isFinito) {
+                    System.out.println("chiuso tr");
                     return;
                 } else {
-                    Platform.runLater(() -> {
-                        Alert a = new Alert(Alert.AlertType.ERROR);
-                        a.setTitle("Vittoria!");
-                        a.setHeaderText("Hai vinto!");
-                        a.setContentText("avversario disconnesso.");
-                        a.show();
-                    });
                     try {
-                        Settings.trr.setIsFinito(true);
-                        Socket temp = new Socket("localhost", 9800);
-                        temp.close();
+                        Platform.runLater(() -> {
+                            Alert a = new Alert(Alert.AlertType.ERROR);
+                            a.setTitle("Vittoria!");
+                            a.setHeaderText("Hai vinto!");
+                            a.setContentText("avversario disconnesso.");
+                            a.show();
+                            Settings.controller.quitAvversario();
+                        });
+                        Settings.trr.close();
+                        System.out.println("chiuso tr2");
                         return;
                     } catch (IOException ex1) {
-                        ex.printStackTrace();
+                        ex1.printStackTrace();
                     }
                 }
             }
@@ -179,6 +182,9 @@ public class ThreadRicezione extends Thread implements Closeable {
     @Override
     public void close() throws IOException {
         isFinito = true;
+        if (Settings.player != null && !Settings.player.isClosed()) {
+            Settings.player.close();
+        }
     }
 
 }

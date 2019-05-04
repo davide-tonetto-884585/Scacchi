@@ -36,7 +36,7 @@
             <Font name="MV Boli" size="41.0" />
          </font>
       </Text>
-      <Button layoutX="799.0" layoutY="537.0" mnemonicParsing="false" onAction="#restart" prefHeight="32.0" prefWidth="145.0" text="Richiedi restart">
+      <Button fx:id="btnRestart" layoutX="799.0" layoutY="537.0" mnemonicParsing="false" onAction="#restart" prefHeight="32.0" prefWidth="145.0" text="Richiedi restart">
          <font>
             <Font size="15.0" />
          </font>
@@ -66,17 +66,17 @@
             <Font size="15.0" />
          </font>
       </Button>
-      <Button layoutX="799.0" layoutY="494.0" mnemonicParsing="false" onAction="#richiediPatta" prefHeight="32.0" prefWidth="145.0" text="Richiedi patta">
+      <Button fx:id="btnPatta" layoutX="799.0" layoutY="494.0" mnemonicParsing="false" onAction="#richiediPatta" prefHeight="32.0" prefWidth="145.0" text="Richiedi patta">
          <font>
             <Font size="15.0" />
          </font>
       </Button>
-      <Button layoutX="632.0" layoutY="494.0" mnemonicParsing="false" onAction="#menuPrincipale" prefHeight="31.0" prefWidth="145.0" text="Menù principale">
+      <Button fx:id="btnMenu" layoutX="632.0" layoutY="494.0" mnemonicParsing="false" onAction="#menuPrincipale" prefHeight="31.0" prefWidth="145.0" text="Menù principale">
          <font>
             <Font size="15.0" />
          </font>
       </Button>
-      <Button layoutX="799.0" layoutY="450.0" mnemonicParsing="false" onAction="#resa" prefHeight="31.0" prefWidth="145.0" text="Arrenditi">
+      <Button fx:id="btnResa" layoutX="799.0" layoutY="450.0" mnemonicParsing="false" onAction="#resa" prefHeight="31.0" prefWidth="145.0" text="Arrenditi">
          <font>
             <Font size="15.0" />
          </font>

@@ -10,49 +10,77 @@
 <?import javafx.scene.text.Text?>
 
 <TabPane fx:id="tabPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="scacchiera.viewController.FXMLConnectionController">
-  <tabs>
-    <Tab text="Crea Partita">
-         <content>
-            <AnchorPane prefHeight="200.0" prefWidth="200.0">
-               <children>
-                  <Text layoutX="53.0" layoutY="82.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Premi il tasto per creare un server e attendi la connessione dell'altro utente" wrappingWidth="493.064453125">
-                     <font>
-                        <Font size="22.0" />
-                     </font>
-                  </Text>
-                  <Button layoutX="53.0" layoutY="166.0" mnemonicParsing="false" onAction="#avviaServer" text="Avvia server">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                  </Button>
-                  <Text layoutX="53.0" layoutY="257.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Stato:">
-                     <font>
-                        <Font size="22.0" />
-                     </font>
-                  </Text>
-                  <Label fx:id="label2" layoutX="53.0" layoutY="263.0" prefHeight="32.0" prefWidth="501.0" text="In attesa di avvio server" />
-               </children>
-            </AnchorPane>
-         </content></Tab>
-    <Tab text="Cerca Partita">
-         <content>
-            <AnchorPane prefHeight="200.0" prefWidth="200.0">
-               <children>
-                  <TextField fx:id="ip" layoutX="75.0" layoutY="81.0" prefHeight="42.0" prefWidth="215.0" promptText="indirizzo" />
-                  <Text layoutX="75.0" layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="IP del server:">
-                     <font>
-                        <Font size="22.0" />
-                     </font>
-                  </Text>
-                  <Button layoutX="367.0" layoutY="82.0" mnemonicParsing="false" onAction="#richiediConnessione" prefHeight="37.0" prefWidth="89.0" text="Cerca" />
-                  <Label fx:id="label" layoutX="75.0" layoutY="256.0" prefHeight="26.0" prefWidth="461.0" text="In attesa dell'avvio della ricerca" />
-                  <Text layoutX="75.0" layoutY="244.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Stato:">
-                     <font>
-                        <Font size="22.0" />
-                     </font>
-                  </Text>
-               </children>
-            </AnchorPane>
-         </content></Tab>
-  </tabs>
+    <tabs>
+        <Tab text="Crea Partita">
+            <content>
+                <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                    <children>
+                        <Text layoutX="53.0" layoutY="82.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Premi il tasto per creare un server e attendi la connessione dell'altro utente" wrappingWidth="493.064453125">
+                            <font>
+                                <Font size="22.0" />
+                            </font>
+                        </Text>
+                        <Button layoutX="53.0" layoutY="166.0" mnemonicParsing="false" onAction="#avviaServer" text="Avvia server">
+                            <font>
+                                <Font size="18.0" />
+                            </font>
+                        </Button>
+                        <Text layoutX="53.0" layoutY="257.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Stato:">
+                            <font>
+                                <Font size="22.0" />
+                            </font>
+                        </Text>
+                        <Label fx:id="label2" layoutX="53.0" layoutY="263.0" prefHeight="32.0" prefWidth="501.0" text="In attesa di avvio server" />
+                    </children>
+                </AnchorPane>
+            </content>
+        </Tab>
+        <Tab text="Cerca Partita">
+            <content>
+                <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                    <children>
+                        <TextField fx:id="ip" layoutX="75.0" layoutY="81.0" prefHeight="42.0" prefWidth="215.0" promptText="indirizzo" />
+                        <Text layoutX="75.0" layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="IP del server:">
+                            <font>
+                                <Font size="22.0" />
+                            </font>
+                        </Text>
+                        <Button layoutX="367.0" layoutY="82.0" mnemonicParsing="false" onAction="#richiediConnessione" prefHeight="37.0" prefWidth="89.0" text="Cerca" />
+                        <Label fx:id="label" layoutX="75.0" layoutY="256.0" prefHeight="26.0" prefWidth="461.0" text="In attesa dell'avvio della ricerca" />
+                        <Text layoutX="75.0" layoutY="244.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Stato:">
+                            <font>
+                                <Font size="22.0" />
+                            </font>
+                        </Text>
+                    </children>
+                </AnchorPane>
+            </content>
+        </Tab>
+        <Tab text="Spettatore">
+            <content>
+                <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                    <children>
+                        <TextField fx:id="ipSpettatore" layoutX="75.0" layoutY="81.0" prefHeight="42.0" prefWidth="215.0" promptText="indirizzo" />
+                        <Text layoutX="75.0" layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="IP del server:">
+                            <font>
+                                <Font size="22.0" />
+                            </font>
+                        </Text>
+                        <Button layoutX="367.0" layoutY="82.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="89.0" text="Guarda" />
+                        <Label fx:id="labelSpettatore" layoutX="75.0" layoutY="256.0" prefHeight="26.0" prefWidth="461.0" text="In attesa dell'avvio della ricerca" />
+                        <Text layoutX="75.0" layoutY="244.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Stato:">
+                            <font>
+                                <Font size="22.0" />
+                            </font>
+                        </Text>
+                    </children>
+                </AnchorPane>
+            </content>
+        </Tab>
+        <Tab onCloseRequest="#esc" text="Torna al menù">
+            <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+            </content>
+        </Tab>
+    </tabs>
 </TabPane>

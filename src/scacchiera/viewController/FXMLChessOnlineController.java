@@ -19,6 +19,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -35,6 +36,18 @@ import scacchiera.model.TCP.Settings;
  * @author tonetto.davide
  */
 public class FXMLChessOnlineController implements Initializable {
+
+    @FXML
+    private Button btnRestart;
+
+    @FXML
+    private Button btnPatta;
+
+    @FXML
+    private Button btnMenu;
+
+    @FXML
+    private Button btnResa;
 
     @FXML
     private AnchorPane anchorPane;
@@ -236,7 +249,7 @@ public class FXMLChessOnlineController implements Initializable {
     }
 
     public void aggiornaScacchiera() {
-        if (turno != null) {
+        if (p.getTurnoCorrente() != null) {
             turno.setText(p.getTurnoCorrente().toString());
         }
         Image img = new Image("/scacchiera/viewController/res/imgs/figure2.png");
@@ -305,12 +318,19 @@ public class FXMLChessOnlineController implements Initializable {
 
     @FXML
     void resa(ActionEvent event) {
-        try {
-            Settings.playerWriter.write("resa\n");
-            Settings.playerWriter.flush();
-            pattaOResaAccettata();
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+        a.setTitle("Attenzione!");
+        a.setHeaderText("Sei sicuro di volerti arrendere?");
+        a.setContentText("Se ti arrendi la partità si concluderà e potrai iniziarne ua nuova richiedendo il restart.");
+        Optional<ButtonType> result = a.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            try {
+                Settings.playerWriter.write("resa\n");
+                Settings.playerWriter.flush();
+                pattaOResaAccettata();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -332,12 +352,14 @@ public class FXMLChessOnlineController implements Initializable {
                 anchorPane.getScene().getWindow().setWidth(600 + 16);
                 scene.setRoot(root);
             } catch (IOException ex) {
-                System.out.println(ex.getMessage());
+                ex.printStackTrace();
             }
             try {
-                Settings.trr.close();
+                if (Settings.trr != null && Settings.trr.isAlive()) {
+                    Settings.trr.close();
+                }
             } catch (IOException ex) {
-                System.out.println(ex.getMessage());
+                ex.printStackTrace();
             }
         }
     }
@@ -354,18 +376,27 @@ public class FXMLChessOnlineController implements Initializable {
 
     public void pattaOResaAccettata() {
         p.setTurnoCorrente(null);
+        btnPatta.setDisable(true);
+        btnResa.setDisable(true);
     }
 
     public void restartAccettato() {
         p = new Partita();
         Settings.partita = p;
-        player = Settings.colore;
         pos1 = null;
         pos2 = null;
         graphics3.clearRect(0, 0, 600, 600);
         aggiornaScacchiera();
         stato.setText("Inizio partita.");
         turno.setText(p.getTurnoCorrente().toString());
+        btnPatta.setDisable(false);
+        btnResa.setDisable(false);
+    }
+    
+    public void quitAvversario(){
+        btnPatta.setDisable(true);
+        btnResa.setDisable(true);
+        btnRestart.setDisable(true);
     }
 
     @FXML
