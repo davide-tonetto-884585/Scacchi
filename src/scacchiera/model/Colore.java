@@ -6,12 +6,21 @@
 package scacchiera.model;
 
 /**
- *
  * @author davide
  */
 public enum Colore {
-    BIANCO, NERO;
-    
+    BIANCO(1), NERO(-1);
+
+    private final int direction;
+
+    Colore(int direction) {
+        this.direction = direction;
+    }
+
+    public int getDirection() {
+        return direction;
+    }
+
     public Colore notThis() {
         return this == BIANCO ? NERO : BIANCO;
     }

@@ -6,7 +6,6 @@
 package scacchiera.model;
 
 /**
- *
  * @author davide
  */
 public enum Simbolo {
@@ -14,7 +13,7 @@ public enum Simbolo {
 
     private final char coding;
 
-    private Simbolo(char coding) {
+    Simbolo(char coding) {
         this.coding = coding;
     }
 

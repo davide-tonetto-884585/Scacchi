@@ -6,13 +6,12 @@
 package scacchiera.model;
 
 /**
- *
  * @author tonetto.davide
  */
 public class Mossa {
 
-    private Posizione posIni;
-    private Posizione posFin;
+    private final Posizione posIni;
+    private final Posizione posFin;
     private Simbolo simbolo;
 
     public Mossa(Posizione posIni, Posizione posFin) {
@@ -27,10 +26,11 @@ public class Mossa {
     public Simbolo getSimbolo() {
         return simbolo;
     }
-    
-    public Mossa(Mossa m){
+
+    public Mossa(Mossa m) {
         this.posIni = new Posizione(m.posIni);
         this.posFin = new Posizione(m.posFin);
+        this.simbolo = m.simbolo;
     }
 
     public Posizione getPosIni() {
@@ -40,12 +40,12 @@ public class Mossa {
     public Posizione getPosFin() {
         return posFin;
     }
-    
-    public boolean equals(Mossa m){
+
+    public boolean equals(Mossa m) {
         return posIni.equals(m.posIni) && posFin.equals(m.posFin);
     }
-    
-    public String toString(){
+
+    public String toString() {
         return posIni.toString() + posFin.toString() + (simbolo == null ? 0 : simbolo.ordinal());
     }
 }

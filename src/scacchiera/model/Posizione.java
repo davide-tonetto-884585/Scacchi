@@ -8,7 +8,6 @@ package scacchiera.model;
 import java.util.Objects;
 
 /**
- *
  * @author davide
  */
 public class Posizione {
@@ -21,7 +20,7 @@ public class Posizione {
         this.colonna = colonna;
     }
 
-    public Posizione(Posizione p){
+    public Posizione(Posizione p) {
         this.riga = p.getRiga();
         this.colonna = p.getColonna();
     }
@@ -45,12 +44,12 @@ public class Posizione {
     public void setColonna(Colonna colonna) {
         this.colonna = colonna;
     }
-    
-    public void clone(Posizione p){
+
+    public void clone(Posizione p) {
         this.colonna = p.getColonna();
         this.riga = p.getRiga();
     }
-    
+
     @Override
     public String toString() {
         return colonna.toString() + riga.toString();
@@ -60,7 +59,7 @@ public class Posizione {
         R1('1'), R2('2'), R3('3'), R4('4'), R5('5'), R6('6'), R7('7'), R8('8');
         private final char valore;
 
-        private Riga(char valore) {
+        Riga(char valore) {
             this.valore = valore;
         }
 
@@ -72,26 +71,26 @@ public class Posizione {
 
     public enum Colonna {
         A('a'), B('b'), C('c'), D('d'), E('e'), F('f'), G('g'), H('h');
-        
+
         private final char simbolo;
 
-        private Colonna(char simbolo) {
+        Colonna(char simbolo) {
             this.simbolo = simbolo;
         }
 
-        public char getSimbolo(){
+        public char getSimbolo() {
             return simbolo;
         }
-        
-        public static Colonna getFromChar(char simbolo){
-            for(Colonna c : Colonna.values()){
-                if(c.getSimbolo() == simbolo){
+
+        public static Colonna getFromChar(char simbolo) {
+            for (Colonna c : Colonna.values()) {
+                if (c.getSimbolo() == simbolo) {
                     return c;
                 }
             }
             return null;
         }
-        
+
         @Override
         public String toString() {
             return Character.toString(simbolo);
@@ -126,5 +125,4 @@ public class Posizione {
         }
         return true;
     }
-    
 }

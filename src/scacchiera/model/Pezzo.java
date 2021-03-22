@@ -8,7 +8,6 @@ package scacchiera.model;
 import java.util.ArrayList;
 
 /**
- *
  * @author davide
  */
 public class Pezzo {
@@ -18,11 +17,11 @@ public class Pezzo {
     private Posizione posizione;
     private ArrayList<Mossa> mosse;
 
-    public Pezzo(Simbolo simbolo, Colore colore){
+    public Pezzo(Simbolo simbolo, Colore colore) {
         this.simbolo = simbolo;
         this.colore = colore;
     }
-    
+
     public Pezzo(Colore colore, Simbolo simbolo, Posizione posizione) {
         this.colore = colore;
         this.simbolo = simbolo;
@@ -34,6 +33,7 @@ public class Pezzo {
         this.posizione = new Posizione(p.posizione);
         this.colore = p.colore;
         this.simbolo = p.simbolo;
+
         if (this.mosse == null) {
             this.mosse = new ArrayList<>();
         } else {
@@ -69,11 +69,12 @@ public class Pezzo {
         return mosse;
     }
 
-    public static ArrayList<Mossa> copiaArray(ArrayList<Mossa> array) {
+    public static ArrayList<Mossa> copiaArray(ArrayList<Mossa> array) { //TODO sposta su utility
         ArrayList<Mossa> fine = new ArrayList<>();
         for (Mossa obj : array) {
             fine.add(new Mossa(obj));
         }
+
         return fine;
     }
 }

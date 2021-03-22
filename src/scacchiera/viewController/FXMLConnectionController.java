@@ -20,6 +20,7 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.Random;
 import java.util.ResourceBundle;
+
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -34,13 +35,14 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import scacchiera.model.Colore;
+
 import static scacchiera.model.Colore.*;
+
 import scacchiera.model.TCP.Settings;
 import scacchiera.model.TCP.ThreadRicezione;
 import scacchiera.model.UDP.*;
 
 /**
- *
  * @author tonetto.davide
  */
 public class FXMLConnectionController extends ComunicazioneUDP implements Initializable {

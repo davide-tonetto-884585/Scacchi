@@ -52,7 +52,7 @@ public class FXMLIndexController implements Initializable {
                 Scene scene = stage.getScene();
                 node.getScene().getWindow().setHeight(594 + 39);
                 node.getScene().getWindow().setWidth(971 + 16);
-                scene.setRoot((Parent) fxmlLoader.load());
+                scene.setRoot(fxmlLoader.load());
             } catch (IOException e) {
                 Logger logger = Logger.getLogger(getClass().getName());
                 logger.log(Level.SEVERE, "Failed to create new Window.", e);
@@ -66,7 +66,7 @@ public class FXMLIndexController implements Initializable {
                 Scene scene = stage.getScene();
                 node.getScene().getWindow().setHeight(400 + 39);
                 node.getScene().getWindow().setWidth(600 + 16);
-                scene.setRoot((Parent) fxmlLoader.load());
+                scene.setRoot(fxmlLoader.load());
             } catch (IOException e) {
                 Logger logger = Logger.getLogger(getClass().getName());
                 logger.log(Level.SEVERE, "Failed to create new Window.", e);

@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -32,7 +33,6 @@ import scacchiera.model.Posizione.*;
 import scacchiera.model.TCP.Settings;
 
 /**
- *
  * @author tonetto.davide
  */
 public class FXMLChessOnlineController implements Initializable {
@@ -392,8 +392,8 @@ public class FXMLChessOnlineController implements Initializable {
         btnPatta.setDisable(false);
         btnResa.setDisable(false);
     }
-    
-    public void quitAvversario(){
+
+    public void quitAvversario() {
         btnPatta.setDisable(true);
         btnResa.setDisable(true);
         btnRestart.setDisable(true);
